@@ -21,6 +21,7 @@ password: admin
 ### Technology Stack
 - **Drupal 11.2.8** - CMS platform
 - **PostgreSQL 16** - Database
+- **Redis 7** - Caching (optional)
 - **Drush 13.7.0** - Command-line tool
 - **Docker & Docker Compose** - Containerization
 
@@ -39,6 +40,47 @@ password: admin
 ```
 
 ### Available Commands
+
+#### Redis Cache Management
+
+Redis is configured as an optional caching layer that can be easily enabled or disabled for development and testing.
+
+**Enable Redis Caching:**
+1. Uncomment the Redis environment variables in `docker-compose.yml`:
+   ```yaml
+   environment:
+     # REDIS_HOST: redis  # Uncomment this line to enable Redis
+     # REDIS_PASSWORD:    # Uncomment and set if Redis auth is needed
+   ```
+2. Uncomment the Redis dependency:
+   ```yaml
+   depends_on:
+     - db
+     # - redis  # Uncomment this line to enable Redis dependency
+   ```
+3. Add this line to `web/sites/default/settings.php`:
+   ```php
+   @include DRUPAL_ROOT . '/sites/default/settings.redis.php';
+   ```
+4. Restart containers: `docker compose up -d`
+
+**Disable Redis Caching:**
+1. Comment out the Redis environment variables in `docker-compose.yml`
+2. Comment out the Redis dependency
+3. Remove or comment the `@include` line in `settings.php`
+4. Restart containers: `docker compose up -d`
+
+**Redis Statistics:**
+```bash
+# Check Redis memory usage
+docker exec drupal-redis-1 redis-cli info memory
+
+# View Redis key count
+docker exec drupal-redis-1 redis-cli dbsize
+
+# Monitor Redis in real-time
+docker exec drupal-redis-1 redis-cli monitor
+```
 
 #### Docker Management
 ```bash

@@ -11,6 +11,15 @@ services:
       - db_data:/var/lib/postgresql/data
     restart: unless-stopped
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
   drupal:
     image: drupal:11-apache
     ports:
@@ -20,12 +29,16 @@ services:
       POSTGRES_DB: drupal
       POSTGRES_USER: drupal
       POSTGRES_PASSWORD: drupal
+      # REDIS_HOST: redis  # Uncomment this line to enable Redis
+      # REDIS_PASSWORD:    # Uncomment and set if Redis auth is needed
     volumes:
       - .:/opt/drupal
     working_dir: /opt/drupal/web
     depends_on:
       - db
+      # - redis  # Uncomment this line to enable Redis dependency
     restart: unless-stopped
 
 volumes:
   db_data:
+  redis_data:
