@@ -142,7 +142,7 @@ Due to Docker container file ownership, run this command after configuration exp
 ```bash
 # Required: Fix configuration directory permissions for git
 docker exec drupal-drupal-1 chown -R 1000:1000 /opt/drupal/web/sites/default/config/
-docker exec drupal-drupal-1 chmod -R 775 /opt/drupal/web/sites/default/config/
+docker exec drupal-drupal-1 chmod -R 644 /opt/drupal/web/sites/default/config/
 ```
 
 This ensures the configuration files created by the container are accessible for git operations on the host machine.

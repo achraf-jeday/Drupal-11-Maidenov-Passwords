@@ -20,6 +20,6 @@ grant_types:
     description: ''
 umbrella: false
 parent: _none
-granularity_id: role
+granularity_id: permission
 granularity_configuration:
-  role: administrator
+  permission: 'access block library'
