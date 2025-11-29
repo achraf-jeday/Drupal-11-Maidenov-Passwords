@@ -16,12 +16,14 @@
     ],
     "require": {
         "composer/installers": "^2.3",
+        "drupal/admin_toolbar": "^3.6",
         "drupal/core-composer-scaffold": "^11.2",
         "drupal/core-project-message": "^11.2",
         "drupal/core-recipe-unpack": "^11.2",
         "drupal/core-recommended": "^11.2",
         "drupal/simple_oauth": "^6.0",
         "drupal/simple_oauth_password_grant": "^2.1",
+        "drupal/simple_oauth_revoke": "^3.0",
         "drush/drush": "^13.7",
         "webflo/drupal-finder": "^1.3"
     },

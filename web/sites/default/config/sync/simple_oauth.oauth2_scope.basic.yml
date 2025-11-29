@@ -16,7 +16,7 @@ grant_types:
     status: true
     description: ''
   password:
-    status: false
+    status: true
     description: ''
 umbrella: false
 parent: _none
