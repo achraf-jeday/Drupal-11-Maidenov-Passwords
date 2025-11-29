@@ -133,6 +133,45 @@ All development happens in the mounted `/var/www/drupal/` directory on your host
 - Active configuration: `web/sites/default/files/config_*/`
 - Sync directory: Configured automatically
 
+### 🔐 OAuth2 Authentication (Headless)
+
+Drupal 11 is configured with OAuth2 authentication for headless frontend applications using Simple OAuth.
+
+**Available OAuth2 Endpoints:**
+- **Token Endpoint**: `POST http://localhost:8080/oauth/token`
+- **Authorization**: `GET http://localhost:8080/oauth/authorize`
+- **User Info**: `GET http://localhost:8080/oauth/userinfo`
+- **JWKS**: `GET http://localhost:8080/oauth/jwks`
+
+**Frontend App Credentials:**
+- **Client ID**: `test-frontend`
+- **Client Secret**: `test-secret-key-12345`
+- **Grant Types**: `password`, `refresh_token`
+- **Scope**: `basic`
+
+**Frontend Login Example:**
+```bash
+curl -X POST http://localhost:8080/oauth/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=password&client_id=test-frontend&client_secret=test-secret-key-12345&username=admin&password=admin"
+```
+
+**Expected Response:**
+```json
+{
+  "token_type": "Bearer",
+  "expires_in": 300,
+  "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...",
+  "refresh_token": "def50200a1b2c3..."
+}
+```
+
+**Using the Access Token:**
+```bash
+curl -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9..." \
+  http://localhost:8080/jsonapi/node/article
+```
+
 ## 🔧 Installation
 
 ### Prerequisites
