@@ -130,8 +130,12 @@ All development happens in the mounted `/var/www/drupal/` directory on your host
 - Contributed themes: `web/themes/contrib/`
 
 ### Configuration Management
-- Active configuration: `web/sites/default/files/config_*/`
-- Sync directory: Configured automatically
+- **Active configuration**: `web/sites/default/files/config_*/`
+- **Sync directory**: `web/sites/default/config/sync/` (for version control)
+- **Export command**: `docker exec drupal-drupal-1 /opt/drupal/vendor/bin/drush cex`
+- **Import command**: `docker exec drupal-drupal-1 /opt/drupal/vendor/bin/drush cim`
+
+**Configuration files are now version-controlled in `web/sites/default/config/sync/` for site-specific deployments.**
 
 ### 🔐 OAuth2 Authentication (Headless)
 

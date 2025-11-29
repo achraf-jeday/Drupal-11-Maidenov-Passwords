@@ -1,0 +1,22 @@
+uuid: 18ea22e6-bc24-46f6-b469-3c7bec4ddbc3
+langcode: en
+status: true
+dependencies: {  }
+id: basic
+name: basic
+description: 'Basic access to user data'
+grant_types:
+  authorization_code:
+    status: true
+    description: ''
+  refresh_token:
+    status: true
+    description: ''
+  client_credentials:
+    status: true
+    description: ''
+umbrella: false
+parent: _none
+granularity_id: role
+granularity_configuration:
+  role: administrator
