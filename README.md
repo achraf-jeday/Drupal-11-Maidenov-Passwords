@@ -137,6 +137,16 @@ All development happens in the mounted `/var/www/drupal/` directory on your host
 
 **Configuration files are now version-controlled in `web/sites/default/config/sync/` for site-specific deployments.**
 
+**🔧 Required: Permission Setup for Git Operations**
+Due to Docker container file ownership, run this command after configuration export to enable git operations:
+```bash
+# Required: Fix configuration directory permissions for git
+docker exec drupal-drupal-1 chown -R 1000:1000 /opt/drupal/web/sites/default/config/
+docker exec drupal-drupal-1 chmod -R 775 /opt/drupal/web/sites/default/config/
+```
+
+This ensures the configuration files created by the container are accessible for git operations on the host machine.
+
 ### 🔐 OAuth2 Authentication (Headless)
 
 Drupal 11 is configured with OAuth2 authentication for headless frontend applications using Simple OAuth.

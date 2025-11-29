@@ -15,6 +15,9 @@ grant_types:
   client_credentials:
     status: true
     description: ''
+  password:
+    status: false
+    description: ''
 umbrella: false
 parent: _none
 granularity_id: role
