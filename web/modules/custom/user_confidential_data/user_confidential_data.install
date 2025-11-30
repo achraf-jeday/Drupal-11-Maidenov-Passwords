@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the User Confidential Data module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function user_confidential_data_install() {
+  // Clear caches to ensure entity types are recognized
+  \Drupal::service('entity_type.bundle.info')->clearCachedBundles();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function user_confidential_data_uninstall() {
+  // Clear caches
+  \Drupal::service('entity_type.bundle.info')->clearCachedBundles();
+}

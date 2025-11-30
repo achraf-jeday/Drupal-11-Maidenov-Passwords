@@ -1,0 +1,19 @@
+administer user confidential data:
+  title: 'Administer user confidential data'
+  description: 'Administer user confidential data types and settings.'
+
+view user confidential data:
+  title: 'View user confidential data'
+  description: 'View user confidential data entities.'
+
+edit user confidential data:
+  title: 'Edit user confidential data'
+  description: 'Edit user confidential data entities.'
+
+create user confidential data:
+  title: 'Create user confidential data'
+  description: 'Create user confidential data entities.'
+
+delete user confidential data:
+  title: 'Delete user confidential data'
+  description: 'Delete user confidential data entities.'
