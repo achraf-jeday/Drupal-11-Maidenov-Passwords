@@ -1,0 +1,6 @@
+# Tab on Admin > Content page
+user_confidential_data.collection:
+  title: 'User Confidential Data'
+  route_name: user_confidential_data.collection
+  base_route: system.admin_content
+  weight: 10
