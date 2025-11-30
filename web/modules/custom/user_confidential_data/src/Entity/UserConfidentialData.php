@@ -8,7 +8,6 @@ use Drupal\Core\Entity\EntityPublishedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\user\EntityOwnerInterface;
 use Drupal\user\EntityOwnerTrait;
 
 /**
@@ -70,7 +69,7 @@ use Drupal\user\EntityOwnerTrait;
  *   field_ui_base_route = "entity.user_confidential_data_type.collection",
  * )
  */
-class UserConfidentialData extends ContentEntityBase implements UserConfidentialDataInterface, EntityOwnerInterface {
+class UserConfidentialData extends ContentEntityBase implements UserConfidentialDataInterface {
 
   use EntityChangedTrait;
   use EntityOwnerTrait;
