@@ -1,0 +1,6 @@
+user_confidential_data.collection:
+  title: 'User Confidential Data'
+  description: 'Manage user confidential data entities'
+  parent: system.admin_content
+  route_name: user_confidential_data.collection
+  weight: 10
