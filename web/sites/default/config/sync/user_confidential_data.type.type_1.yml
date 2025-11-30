@@ -1,0 +1,6 @@
+uuid: a3c49e2c-fa35-4c35-8945-b5ca2c19225d
+langcode: en
+status: true
+dependencies: {  }
+id: type_1
+label: 'Type 1'
