@@ -1,0 +1,64 @@
+user_confidential_data.add_bundle:
+  path: '/admin/structure/user-confidential-data-type/add'
+  defaults:
+    _form: '\Drupal\user_confidential_data\Form\AddBundleForm'
+    _title: 'Add User Confidential Data Type'
+  requirements:
+    _permission: 'administer user confidential data'
+  options:
+    _admin_route: TRUE
+
+user_confidential_data.collection:
+  path: '/admin/content/user-confidential-data'
+  defaults:
+    _entity_list: 'user_confidential_data'
+    _title: 'User Confidential Data'
+  requirements:
+    _permission: 'administer user confidential data'
+  options:
+    _admin_route: TRUE
+
+user_confidential_data.entity_add:
+  path: '/admin/content/user-confidential-data/add/{user_confidential_data_type}'
+  defaults:
+    _entity_form: 'user_confidential_data.add'
+    _title: 'Add User Confidential Data'
+    user_confidential_data_type:
+      {}
+  requirements:
+    _permission: 'create user confidential data'
+  options:
+    _admin_route: TRUE
+    parameters:
+      user_confidential_data_type:
+        type: entity:user_confidential_data_type
+
+user_confidential_data.entity_edit:
+  path: '/admin/content/user-confidential-data/{user_confidential_data}/edit'
+  defaults:
+    _entity_form: 'user_confidential_data.edit'
+    _title: 'Edit User Confidential Data'
+    user_confidential_data:
+      {}
+  requirements:
+    _permission: 'edit user confidential data'
+  options:
+    _admin_route: TRUE
+    parameters:
+      user_confidential_data:
+        type: entity:user_confidential_data
+
+user_confidential_data.entity_delete:
+  path: '/admin/content/user-confidential-data/{user_confidential_data}/delete'
+  defaults:
+    _entity_form: 'user_confidential_data.delete'
+    _title: 'Delete User Confidential Data'
+    user_confidential_data:
+      {}
+  requirements:
+    _permission: 'delete user confidential data'
+  options:
+    _admin_route: TRUE
+    parameters:
+      user_confidential_data:
+        type: entity:user_confidential_data

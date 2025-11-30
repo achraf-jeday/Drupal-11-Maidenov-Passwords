@@ -28,6 +28,7 @@ use Drupal\user\EntityOwnerTrait;
  *     "storage_schema" = "Drupal\user_confidential_data\UserConfidentialDataStorageSchema",
  *     "access" = "Drupal\user_confidential_data\UserConfidentialDataAccessControlHandler",
  *     "views_data" = "Drupal\views\EntityViewsData",
+ *     "list_builder" = "Drupal\user_confidential_data\UserConfidentialDataListBuilder",
  *     "form" = {
  *       "add" = "Drupal\Core\Entity\ContentEntityForm",
  *       "edit" = "Drupal\Core\Entity\ContentEntityForm",
@@ -47,6 +48,7 @@ use Drupal\user\EntityOwnerTrait;
  *     "uuid" = "uuid",
  *     "uid" = "user_id",
  *     "langcode" = "langcode",
+ *     "label" = "name",
  *   },
  *   revision_metadata_keys = {
  *     "revision_user" = "revision_user",
@@ -56,7 +58,6 @@ use Drupal\user\EntityOwnerTrait;
  *   links = {
  *     "collection" = "/admin/content/user-confidential-data",
  *     "add-page" = "/admin/content/user-confidential-data/add",
- *     "add-form" = "/admin/content/user-confidential-data/add/{type}",
  *     "canonical" = "/user-confidential-data/{user_confidential_data}",
  *     "edit-form" = "/admin/content/user-confidential-data/{user_confidential_data}/edit",
  *     "delete-form" = "/admin/content/user-confidential-data/{user_confidential_data}/delete",
@@ -83,8 +84,8 @@ class UserConfidentialData extends ContentEntityBase implements UserConfidential
 
     // If no revision author has been set explicitly, make the user_confidential_data
     // owner the revision author.
-    if (!$this->getRevisionUser()) {
-      $this->setRevisionUserId($this->getOwnerId());
+    if ($this->hasField('revision_user') && !$this->get('revision_user')->value) {
+      $this->set('revision_user', $this->getOwnerId());
     }
   }
 
@@ -171,6 +172,7 @@ class UserConfidentialData extends ContentEntityBase implements UserConfidential
       ->setSetting('handler', 'default')
       ->setTranslatable(TRUE)
       ->setCardinality(1)
+      ->setRequired(TRUE)
       ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'author',
@@ -198,8 +200,9 @@ class UserConfidentialData extends ContentEntityBase implements UserConfidential
         'text_processing' => 0,
       ])
       ->setDefaultValue('')
+      ->setRequired(TRUE)
       ->setDisplayOptions('view', [
-        'label' => 'hidden',
+        'label' => 'visible',
         'type' => 'string',
         'weight' => -5,
       ])
@@ -232,6 +235,41 @@ class UserConfidentialData extends ContentEntityBase implements UserConfidential
       ->setDescription(t('The time that the user confidential data was last edited.'))
       ->setRevisionable(TRUE)
       ->setTranslatable(TRUE);
+
+    // Add the status field for publishing
+    $fields['status'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Status'))
+      ->setDescription(t('A boolean indicating whether the User Confidential Data is published.'))
+      ->setDefaultValue(TRUE)
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox',
+        'weight' => 100,
+      ]);
+
+    // Revision metadata fields - required for revision functionality
+    $fields['revision_user'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Revision User'))
+      ->setDescription(t('The user who created the revision.'))
+      ->setRevisionable(TRUE)
+      ->setSetting('target_type', 'user')
+      ->setSetting('handler', 'default')
+      ->setTranslatable(TRUE)
+      ->setCardinality(1)
+      ->setReadOnly(TRUE);
+
+    $fields['revision_created'] = BaseFieldDefinition::create('created')
+      ->setLabel(t('Revision created'))
+      ->setDescription(t('The time that the current revision was created.'))
+      ->setRevisionable(TRUE)
+      ->setTranslatable(TRUE)
+      ->setReadOnly(TRUE);
+
+    $fields['revision_log'] = BaseFieldDefinition::create('string_long')
+      ->setLabel(t('Revision log message'))
+      ->setDescription(t('The log entry explaining the changes in this revision.'))
+      ->setRevisionable(TRUE)
+      ->setTranslatable(TRUE)
+      ->setDefaultValue('');
 
     $fields['revision_translation_affected'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Revision translation affected'))
