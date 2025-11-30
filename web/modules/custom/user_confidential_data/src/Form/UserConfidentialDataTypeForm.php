@@ -99,14 +99,14 @@ class UserConfidentialDataTypeForm extends EntityForm {
     $status = $user_confidential_data_type->save();
 
     if ($status) {
-      drupal_set_message($this->t('Saved the %label user confidential data type.', [
+      $this->messenger()->addMessage($this->t('Saved the %label user confidential data type.', [
         '%label' => $user_confidential_data_type->label(),
       ]));
     }
     else {
-      drupal_set_message($this->t('The %label user confidential data type was not saved.', [
+      $this->messenger()->addMessage($this->t('The %label user confidential data type was not saved.', [
         '%label' => $user_confidential_data_type->label(),
-      ]));
+      ]), 'error');
     }
 
     $form_state->setRedirect('entity.user_confidential_data_type.collection');

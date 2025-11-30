@@ -39,7 +39,7 @@ class UserConfidentialDataTypeDeleteForm extends EntityConfirmFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->entity->delete();
-    drupal_set_message($this->t('The user confidential data type %label has been deleted.', [
+    $this->messenger()->addMessage($this->t('The user confidential data type %label has been deleted.', [
       '%label' => $this->entity->label(),
     ]));
     $form_state->setRedirectUrl($this->getCancelUrl());
