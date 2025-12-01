@@ -1,0 +1,282 @@
+uuid: 12345678-1234-1234-1234-123456789abc
+langcode: en
+status: true
+dependencies:
+  module:
+    - user_confidential_data
+id: user_confidential_data--type_1
+resourceType: 'entity:user_confidential_data'
+resourceName: user_confidential_data/type_1
+disabled: false
+formats:
+  - jsonapi
+authentication: {  }
+paths:
+  -
+    save: /jsonapi/user_confidential_data/type_1
+    fetch: /jsonapi/user_confidential_data/type_1
+  -
+    save: '/jsonapi/user_confidential_data/type_1/{entity}'
+    fetch: '/jsonapi/user_confidential_data/type_1/{entity}'
+fields:
+  changed:
+    disabled: false
+    hidden: false
+    subresources:
+      get:
+        disabled: false
+        hidden: false
+      patch:
+        disabled: false
+        hidden: false
+      post:
+        disabled: false
+        hidden: false
+      delete:
+        disabled: false
+        hidden: false
+      relationship:
+        get:
+          disabled: false
+          hidden: false
+        patch:
+          disabled: false
+          hidden: false
+        post:
+          disabled: false
+          hidden: false
+        delete:
+          disabled: false
+          hidden: false
+  created:
+    disabled: false
+    hidden: false
+    subresources:
+      get:
+        disabled: false
+        hidden: false
+      patch:
+        disabled: false
+        hidden: false
+      post:
+        disabled: false
+        hidden: false
+      delete:
+        disabled: false
+        hidden: false
+      relationship:
+        get:
+          disabled: false
+          hidden: false
+        patch:
+          disabled: false
+          hidden: false
+        post:
+          disabled: false
+          hidden: false
+        delete:
+          disabled: false
+          hidden: false
+  langcode:
+    disabled: false
+    hidden: false
+    subresources:
+      get:
+        disabled: false
+        hidden: false
+      patch:
+        disabled: false
+        hidden: false
+      post:
+        disabled: false
+        hidden: false
+      delete:
+        disabled: false
+        hidden: false
+      relationship:
+        get:
+          disabled: false
+          hidden: false
+        patch:
+          disabled: false
+          hidden: false
+        post:
+          disabled: false
+          hidden: false
+        delete:
+          disabled: false
+          hidden: false
+  name:
+    disabled: false
+    hidden: false
+    subresources:
+      get:
+        disabled: false
+        hidden: false
+      patch:
+        disabled: false
+        hidden: false
+      post:
+        disabled: false
+        hidden: false
+      delete:
+        disabled: false
+        hidden: false
+      relationship:
+        get:
+          disabled: false
+          hidden: false
+        patch:
+          disabled: false
+          hidden: false
+        post:
+          disabled: false
+          hidden: false
+        delete:
+          disabled: false
+          hidden: false
+  revision_log:
+    disabled: false
+    hidden: false
+    subresources:
+      get:
+        disabled: false
+        hidden: false
+      patch:
+        disabled: false
+        hidden: false
+      post:
+        disabled: false
+        hidden: false
+      delete:
+        disabled: false
+        hidden: false
+      relationship:
+        get:
+          disabled: false
+          hidden: false
+        patch:
+          disabled: false
+          hidden: false
+        post:
+          disabled: false
+          hidden: false
+        delete:
+          disabled: false
+          hidden: false
+  revision_translation_affected:
+    disabled: false
+    hidden: false
+    subresources:
+      get:
+        disabled: false
+        hidden: false
+      patch:
+        disabled: false
+        hidden: false
+      post:
+        disabled: false
+        hidden: false
+      delete:
+        disabled: false
+        hidden: false
+      relationship:
+        get:
+          disabled: false
+          hidden: false
+        patch:
+          disabled: false
+          hidden: false
+        post:
+          disabled: false
+          hidden: false
+        delete:
+          disabled: false
+          hidden: false
+  status:
+    disabled: false
+    hidden: false
+    subresources:
+      get:
+        disabled: false
+        hidden: false
+      patch:
+        disabled: false
+        hidden: false
+      post:
+        disabled: false
+        hidden: false
+      delete:
+        disabled: false
+        hidden: false
+      relationship:
+        get:
+          disabled: false
+          hidden: false
+        patch:
+          disabled: false
+          hidden: false
+        post:
+          disabled: false
+          hidden: false
+        delete:
+          disabled: false
+          hidden: false
+  uid:
+    disabled: false
+    hidden: false
+    subresources:
+      get:
+        disabled: false
+        hidden: false
+      patch:
+        disabled: false
+        hidden: false
+      post:
+        disabled: false
+        hidden: false
+      delete:
+        disabled: false
+        hidden: false
+      relationship:
+        get:
+          disabled: false
+          hidden: false
+        patch:
+          disabled: false
+          hidden: false
+        post:
+          disabled: false
+          hidden: false
+        delete:
+          disabled: false
+          hidden: false
+  user_id:
+    disabled: false
+    hidden: false
+    subresources:
+      get:
+        disabled: false
+        hidden: false
+      patch:
+        disabled: false
+        hidden: false
+      post:
+        disabled: false
+        hidden: false
+      delete:
+        disabled: false
+        hidden: false
+      relationship:
+        get:
+          disabled: false
+          hidden: false
+        patch:
+          disabled: false
+          hidden: false
+        post:
+          disabled: false
+          hidden: false
+        delete:
+          disabled: false
+          hidden: false
