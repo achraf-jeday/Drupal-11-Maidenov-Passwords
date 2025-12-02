@@ -212,6 +212,23 @@ class UserConfidentialData extends ContentEntityBase implements UserConfidential
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
+    $fields['email'] = BaseFieldDefinition::create('email')
+      ->setLabel(t('Email'))
+      ->setDescription(t('The email address associated with this confidential data.'))
+      ->setRevisionable(TRUE)
+      ->setRequired(FALSE)
+      ->setDisplayOptions('view', [
+        'label' => 'visible',
+        'type' => 'basic_string',
+        'weight' => -4,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'email_default',
+        'weight' => -4,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Authored on'))
       ->setDescription(t('The time that the user confidential data was created.'))
