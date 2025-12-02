@@ -295,6 +295,99 @@ class UserConfidentialData extends ContentEntityBase implements UserConfidential
       ->setRevisionable(TRUE)
       ->setTranslatable(TRUE);
 
+    // Add the Link field
+    $fields['link'] = BaseFieldDefinition::create('link')
+      ->setLabel(t('Link'))
+      ->setDescription(t('The link associated with this confidential data.'))
+      ->setRevisionable(TRUE)
+      ->setTranslatable(TRUE)
+      ->setSettings([
+        'link_type' => 17, // External and internal links
+        'title' => 'optional', // Optional title
+      ])
+      ->setDefaultValue('')
+      ->setRequired(FALSE)
+      ->setDisplayOptions('view', [
+        'label' => 'visible',
+        'type' => 'link',
+        'weight' => 1,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'link_default',
+        'weight' => 1,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
+    // Add the Username field
+    $fields['username'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Username'))
+      ->setDescription(t('The username for this confidential data.'))
+      ->setRevisionable(TRUE)
+      ->setSettings([
+        'max_length' => 255,
+        'text_processing' => 0,
+      ])
+      ->setDefaultValue('')
+      ->setRequired(FALSE)
+      ->setDisplayOptions('view', [
+        'label' => 'visible',
+        'type' => 'string',
+        'weight' => 2,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield',
+        'weight' => 2,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
+    // Add the Password field
+    $fields['password'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Password'))
+      ->setDescription(t('The password for this confidential data.'))
+      ->setRevisionable(TRUE)
+      ->setSettings([
+        'max_length' => 255,
+        'text_processing' => 0,
+      ])
+      ->setDefaultValue('')
+      ->setRequired(FALSE)
+      ->setDisplayOptions('view', [
+        'label' => 'visible',
+        'type' => 'string',
+        'weight' => 3,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield',
+        'weight' => 3,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
+    // Add the Notes field
+    $fields['notes'] = BaseFieldDefinition::create('string_long')
+      ->setLabel(t('Notes'))
+      ->setDescription(t('Additional notes for this confidential data.'))
+      ->setRevisionable(TRUE)
+      ->setTranslatable(TRUE)
+      ->setDefaultValue('')
+      ->setRequired(FALSE)
+      ->setDisplayOptions('view', [
+        'label' => 'visible',
+        'type' => 'basic_string',
+        'weight' => 4,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'string_textarea',
+        'weight' => 4,
+        'settings' => [
+          'rows' => 4,
+        ],
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
     return $fields;
   }
 
