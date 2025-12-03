@@ -280,3 +280,148 @@ fields:
         delete:
           disabled: false
           hidden: false
+  email:
+    disabled: false
+    hidden: false
+    subresources:
+      get:
+        disabled: false
+        hidden: false
+      patch:
+        disabled: false
+        hidden: false
+      post:
+        disabled: false
+        hidden: false
+      delete:
+        disabled: false
+        hidden: false
+      relationship:
+        get:
+          disabled: false
+          hidden: false
+        patch:
+          disabled: false
+          hidden: false
+        post:
+          disabled: false
+          hidden: false
+        delete:
+          disabled: false
+          hidden: false
+  username:
+    disabled: false
+    hidden: false
+    subresources:
+      get:
+        disabled: false
+        hidden: false
+      patch:
+        disabled: false
+        hidden: false
+      post:
+        disabled: false
+        hidden: false
+      delete:
+        disabled: false
+        hidden: false
+      relationship:
+        get:
+          disabled: false
+          hidden: false
+        patch:
+          disabled: false
+          hidden: false
+        post:
+          disabled: false
+          hidden: false
+        delete:
+          disabled: false
+          hidden: false
+  password:
+    disabled: false
+    hidden: false
+    subresources:
+      get:
+        disabled: false
+        hidden: false
+      patch:
+        disabled: false
+        hidden: false
+      post:
+        disabled: false
+        hidden: false
+      delete:
+        disabled: false
+        hidden: false
+      relationship:
+        get:
+          disabled: false
+          hidden: false
+        patch:
+          disabled: false
+          hidden: false
+        post:
+          disabled: false
+          hidden: false
+        delete:
+          disabled: false
+          hidden: false
+  link:
+    disabled: false
+    hidden: false
+    subresources:
+      get:
+        disabled: false
+        hidden: false
+      patch:
+        disabled: false
+        hidden: false
+      post:
+        disabled: false
+        hidden: false
+      delete:
+        disabled: false
+        hidden: false
+      relationship:
+        get:
+          disabled: false
+          hidden: false
+        patch:
+          disabled: false
+          hidden: false
+        post:
+          disabled: false
+          hidden: false
+        delete:
+          disabled: false
+          hidden: false
+  notes:
+    disabled: false
+    hidden: false
+    subresources:
+      get:
+        disabled: false
+        hidden: false
+      patch:
+        disabled: false
+        hidden: false
+      post:
+        disabled: false
+        hidden: false
+      delete:
+        disabled: false
+        hidden: false
+      relationship:
+        get:
+          disabled: false
+          hidden: false
+        patch:
+          disabled: false
+          hidden: false
+        post:
+          disabled: false
+          hidden: false
+        delete:
+          disabled: false
+          hidden: false
