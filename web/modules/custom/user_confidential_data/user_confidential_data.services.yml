@@ -1,0 +1,10 @@
+services:
+  user_confidential_data.field_encryption:
+    class: Drupal\user_confidential_data\Encryption\FieldEncryptionService
+    arguments: ['@logger.factory']
+    public: true
+
+  user_confidential_data.entity_encryption_helper:
+    class: Drupal\user_confidential_data\Encryption\EntityEncryptionHelper
+    arguments: ['@user_confidential_data.field_encryption']
+    public: true

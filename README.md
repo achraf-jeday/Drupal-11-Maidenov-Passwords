@@ -213,6 +213,10 @@ curl -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9..." \
 - **Admin User**: `admin`
 - **Admin Password**: `admin`
 
+## 🔐 Encryption
+
+Field-level encryption is implemented for the UserConfidentialData module. See [ENCRYPTION_GUIDE.md](web/modules/custom/user_confidential_data/ENCRYPTION_GUIDE.md) for setup and usage instructions.
+
 ## 🚀 Deployment
 
 *Deployment instructions will be added in future sections.*

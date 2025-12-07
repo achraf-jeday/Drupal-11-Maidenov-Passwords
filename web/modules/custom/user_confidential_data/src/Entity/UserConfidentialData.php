@@ -24,6 +24,7 @@ use Drupal\user\EntityOwnerTrait;
  *     plural = "@count User Confidential Data",
  *   ),
  *   handlers = {
+ *     "storage" = "Drupal\user_confidential_data\Storage\UserConfidentialDataStorage",
  *     "storage_schema" = "Drupal\user_confidential_data\UserConfidentialDataStorageSchema",
  *     "access" = "Drupal\user_confidential_data\UserConfidentialDataAccessControlHandler",
  *     "views_data" = "Drupal\views\EntityViewsData",

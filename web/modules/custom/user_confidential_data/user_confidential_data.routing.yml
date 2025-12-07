@@ -62,3 +62,13 @@ user_confidential_data.entity_delete:
     parameters:
       user_confidential_data:
         type: entity:user_confidential_data
+
+user_confidential_data.encryption_settings:
+  path: '/admin/config/user-confidential-data/encryption'
+  defaults:
+    _form: '\Drupal\user_confidential_data\Form\EncryptionSettingsForm'
+    _title: 'Encryption Settings'
+  requirements:
+    _permission: 'administer user confidential data'
+  options:
+    _admin_route: TRUE
