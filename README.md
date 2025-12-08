@@ -362,12 +362,15 @@ curl -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9..." \
 
 ## 🔐 Encryption
 
-Field-level encryption is implemented for the UserConfidentialData module. The system uses Docker Secrets for secure key management:
+Field-level encryption is implemented for the UserConfidentialData module. The system uses Docker Secrets with maximum security:
 
-**Active Encryption Source: Docker Secrets**
-- **Location**: `/var/www/drupal/secrets/user_confidential_data_key`
+**Active Encryption Source: Docker Secrets (Production-Ready)**
+- **Key Generation**: OpenSSL rand -hex 32 (256-bit cryptographically secure)
+- **Host Location**: `/var/www/drupal/secrets/user_confidential_data_key`
 - **Container Path**: `/run/secrets/user_confidential_data_key`
-- **Security**: High - mounted as read-only tmpfs in memory
+- **Storage**: tmpfs (in-memory, no disk persistence)
+- **Permissions**: 600 file, 700 directory
+- **Security**: Maximum - secrets exist only in RAM
 
 **Key Source Priority:**
 1. Docker Secrets (`/run/secrets/user_confidential_data_key`) - **ACTIVE**

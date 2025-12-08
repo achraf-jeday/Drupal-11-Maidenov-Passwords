@@ -25,13 +25,21 @@ environment:
 
 **Option C: Docker Secrets (Production)**
 ```bash
-# Create secret file (current setup)
-echo "your-32-byte-master-key-for-hkdf" > /var/www/drupal/secrets/user_confidential_data_key
+# 1. Generate cryptographically secure key
+openssl rand -hex 32 > /var/www/drupal/secrets/user_confidential_data_key
 chmod 600 /var/www/drupal/secrets/user_confidential_data_key
+chmod 700 /var/www/drupal/secrets/
 
-# Mount in docker-compose.yml
+# 2. Mount as tmpfs in docker-compose.yml (maximum security)
 volumes:
-  - ./secrets:/run/secrets:ro
+  - type: tmpfs
+    target: /run/secrets
+    tmpfs:
+      size: 1000000  # 1MB
+
+# 3. Copy key to container
+docker cp /var/www/drupal/secrets/user_confidential_data_key drupal-drupal-1:/run/secrets/
+docker exec drupal-drupal-1 chmod 600 /run/secrets/user_confidential_data_key
 ```
 
 ### 2. Enable Module
@@ -52,7 +60,13 @@ $entity->save();
 
 ## 🔑 Key Management
 
-**Current Active Source: Docker Secrets** (Production-ready)
+**Current Active Source: Docker Secrets** (Production-ready, tmpfs)
+
+**Security Features:**
+- **Key Generation**: OpenSSL rand -hex 32 (256-bit entropy)
+- **Storage**: tmpfs (in-memory, no disk persistence)
+- **Permissions**: 600 file, 700 directory
+- **Size**: 1MB tmpfs limit
 
 **Priority order:**
 1. Docker secrets (`/run/secrets/user_confidential_data_key`) - **ACTIVE**
@@ -92,14 +106,15 @@ echo $entity->get('password')->value; // Shows actual password
 ## 🛠️ Troubleshooting
 
 **"No encryption key found"**
-- Check Docker secrets: `docker exec drupal-drupal-1 cat /run/secrets/user_confidential_data_key`
-- Verify secret file exists: `ls -la /var/www/drupal/secrets/`
+- Check tmpfs mount: `docker exec drupal-drupal-1 mount | grep secrets`
+- Verify secret file: `docker exec drupal-drupal-1 cat /run/secrets/user_confidential_data_key`
+- Check host file: `ls -la /var/www/drupal/secrets/`
 - Check environment variable: `docker exec drupal-drupal-1 env | grep USER_CONFIDENTIAL_DATA_KEY`
-- Verify settings form configuration
 
 **"Encryption failed"**
-- Ensure OpenSSL extension is enabled: `docker exec drupal-drupal-1 php -m | grep openssl`
-- Verify key is 32+ characters: `wc -c /var/www/drupal/secrets/user_confidential_data_key`
+- Ensure OpenSSL extension: `docker exec drupal-drupal-1 php -m | grep openssl`
+- Verify key length (74 chars): `wc -c /var/www/drupal/secrets/user_confidential_data_key`
+- Check tmpfs mount: `docker exec drupal-drupal-1 mount | grep tmpfs`
 - Check Drupal logs: `docker exec drupal-drupal-1 /opt/drupal/vendor/bin/drush watchdog-show`
 
 ## 📁 Key Files

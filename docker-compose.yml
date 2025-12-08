@@ -32,7 +32,10 @@ services:
       # REDIS_PASSWORD:    # Uncomment and set if Redis auth is needed
     volumes:
       - .:/opt/drupal
-      - ./secrets:/run/secrets:ro
+      - type: tmpfs
+        target: /run/secrets
+        tmpfs:
+          size: 1000000  # 1MB
     working_dir: /opt/drupal/web
     depends_on:
       - db
