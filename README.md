@@ -46,11 +46,10 @@ password: admin
 
 Redis is configured as a high-performance caching layer using PhpRedis extension for optimal performance with Drupal 11. The system is designed to be easily enabled or disabled for different environments.
 
-**Current Status: ✅ ACTIVE**
-- **Performance**: 85% cache hit rate (10,795 hits vs 2,025 misses)
-- **Memory Usage**: 7.42MB active cache storage
-- **Cache Keys**: 1,223 active cache entries
-- **Extension**: PhpRedis (high-performance C extension)
+**Current Status: 🚫 DISABLED (Development Mode)**
+- **Mode**: Redis caching is disabled for local development
+- **To Enable**: Follow the Production Setup steps below
+- **Note**: Redis container remains running but is not used by Drupal
 
 ##### 🚀 Production Setup (Enable Redis Caching)
 
@@ -82,7 +81,7 @@ Add this line to `web/sites/default/settings.php`:
 docker compose up -d
 ```
 
-##### 🛠️ Development Setup (Disable Redis Caching)
+##### 🛠️ Development Setup (Disable Redis Caching) - ✅ CURRENT CONFIGURATION
 
 **Step 1: Environment Variables**
 Comment out Redis configuration in `docker-compose.yml`:
@@ -110,6 +109,9 @@ Remove or comment the include line in `settings.php`:
 ```bash
 docker compose up -d
 ```
+
+**✅ Already Configured for Development**
+The current setup is already configured for development with Redis disabled. The Redis container remains available for easy re-enabling when needed.
 
 ##### ⚡ Performance Optimization
 
@@ -158,6 +160,8 @@ $settings['redis.connection']['password'] = getenv('REDIS_PASSWORD');
 
 ##### 📊 Redis Monitoring & Statistics
 
+**Note**: These commands are available when Redis is enabled in production.
+
 **Real-time Monitoring:**
 ```bash
 # Live cache activity
@@ -189,7 +193,7 @@ docker exec drupal-redis-1 redis-cli keys "drupal.redis.*.render:*" | head -10
 ```
 
 **Performance Metrics:**
-- **Target Hit Rate**: >80% (Current: 85% ✅)
+- **Target Hit Rate**: >80% (when enabled)
 - **Memory Usage**: <256MB for small-medium sites
 - **Response Time**: <5ms for cache reads
 - **TTL**: Automatic expiration based on cache type
