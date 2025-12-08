@@ -1,0 +1,9 @@
+<?php
+
+/**
+ * @file
+ * Contains user_confidential_data.module.
+ *
+ * Filtering on encrypted fields is handled by the custom Query class.
+ * @see \Drupal\user_confidential_data\Entity\Query\Sql\Query
+ */

@@ -38,6 +38,29 @@ class UserConfidentialDataStorage extends SqlContentEntityStorage {
   /**
    * {@inheritdoc}
    */
+  public function getQuery($conjunction = 'AND') {
+    // Use our custom query class that handles encrypted field filtering.
+    // Get the standard namespaces from the base Drupal query system.
+    $namespaces = ['Drupal\Core\Entity\Query\Sql'];
+    return new \Drupal\user_confidential_data\Entity\Query\Sql\Query(
+      $this->entityType,
+      $conjunction,
+      $this->database,
+      $namespaces
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAggregateQuery($conjunction = 'AND') {
+    // For aggregate queries, use the default implementation.
+    return parent::getAggregateQuery($conjunction);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function doPreSave(EntityInterface $entity) {
     // Encrypt confidential fields before saving
     $this->encryptEntityFields($entity);
@@ -110,6 +133,95 @@ class UserConfidentialDataStorage extends SqlContentEntityStorage {
     }
 
     return $entities;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function loadByProperties(array $values = []) {
+    // Separate encrypted and non-encrypted field conditions.
+    $encryption_service = $this->getEncryptionService();
+    $encrypted_fields = $encryption_service ? $encryption_service->getEncryptedFields() : [];
+
+    $encrypted_conditions = [];
+    $regular_conditions = [];
+
+    foreach ($values as $field_name => $value) {
+      if (in_array($field_name, $encrypted_fields)) {
+        $encrypted_conditions[$field_name] = $value;
+      }
+      else {
+        $regular_conditions[$field_name] = $value;
+      }
+    }
+
+    // If there are no encrypted conditions, use the default behavior.
+    if (empty($encrypted_conditions)) {
+      return parent::loadByProperties($values);
+    }
+
+    // Load entities with only non-encrypted conditions.
+    $entities = parent::loadByProperties($regular_conditions);
+
+    // Filter entities by encrypted field values.
+    if (!empty($encrypted_conditions)) {
+      $entities = $this->filterByEncryptedFields($entities, $encrypted_conditions);
+    }
+
+    return $entities;
+  }
+
+  /**
+   * Filters entities by encrypted field values.
+   *
+   * @param array $entities
+   *   Array of entities to filter.
+   * @param array $conditions
+   *   Array of field => value conditions for encrypted fields.
+   *
+   * @return array
+   *   Filtered array of entities.
+   */
+  protected function filterByEncryptedFields(array $entities, array $conditions) {
+    $filtered = [];
+
+    foreach ($entities as $entity) {
+      $matches = TRUE;
+
+      foreach ($conditions as $field_name => $expected_value) {
+        if (!$entity->hasField($field_name)) {
+          $matches = FALSE;
+          break;
+        }
+
+        $field = $entity->get($field_name);
+        if ($field->isEmpty()) {
+          $matches = FALSE;
+          break;
+        }
+
+        // The field is already decrypted by mapFromStorageRecords.
+        $actual_value = $field->value;
+
+        // Case-insensitive comparison for strings.
+        if (is_string($actual_value) && is_string($expected_value)) {
+          if (mb_strtolower($actual_value) !== mb_strtolower($expected_value)) {
+            $matches = FALSE;
+            break;
+          }
+        }
+        elseif ($actual_value != $expected_value) {
+          $matches = FALSE;
+          break;
+        }
+      }
+
+      if ($matches) {
+        $filtered[$entity->id()] = $entity;
+      }
+    }
+
+    return $filtered;
   }
 
   /**
