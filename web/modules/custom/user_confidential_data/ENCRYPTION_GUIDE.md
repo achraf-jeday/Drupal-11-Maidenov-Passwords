@@ -40,6 +40,7 @@ volumes:
 # 3. Copy key to container
 docker cp /var/www/drupal/secrets/user_confidential_data_key drupal-drupal-1:/run/secrets/
 docker exec drupal-drupal-1 chmod 600 /run/secrets/user_confidential_data_key
+docker exec drupal-drupal-1 chown www-data:www-data /run/secrets/user_confidential_data_key
 ```
 
 ### 2. Enable Module
@@ -108,6 +109,7 @@ echo $entity->get('password')->value; // Shows actual password
 **"No encryption key found"**
 - Check tmpfs mount: `docker exec drupal-drupal-1 mount | grep secrets`
 - Verify secret file: `docker exec drupal-drupal-1 cat /run/secrets/user_confidential_data_key`
+- Check file ownership: `docker exec drupal-drupal-1 ls -la /run/secrets/`
 - Check host file: `ls -la /var/www/drupal/secrets/`
 - Check environment variable: `docker exec drupal-drupal-1 env | grep USER_CONFIDENTIAL_DATA_KEY`
 

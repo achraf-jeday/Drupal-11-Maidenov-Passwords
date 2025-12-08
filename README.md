@@ -369,13 +369,18 @@ Field-level encryption is implemented for the UserConfidentialData module. The s
 - **Host Location**: `/var/www/drupal/secrets/user_confidential_data_key`
 - **Container Path**: `/run/secrets/user_confidential_data_key`
 - **Storage**: tmpfs (in-memory, no disk persistence)
-- **Permissions**: 600 file, 700 directory
+- **Permissions**: 600 file, 700 directory, owned by `www-data:www-data`
 - **Security**: Maximum - secrets exist only in RAM
 
 **Key Source Priority:**
 1. Docker Secrets (`/run/secrets/user_confidential_data_key`) - **ACTIVE**
 2. Environment Variable (`USER_CONFIDENTIAL_DATA_KEY`) - Disabled
 3. Drupal Settings (`$settings['user_confidential_data_encryption_key']`) - Fallback
+
+**Important**: After copying the secret file to the container, ensure proper ownership:
+```bash
+docker exec drupal-drupal-1 chown www-data:www-data /run/secrets/user_confidential_data_key
+```
 
 See [ENCRYPTION_GUIDE.md](web/modules/custom/user_confidential_data/ENCRYPTION_GUIDE.md) for setup and usage instructions.
 
