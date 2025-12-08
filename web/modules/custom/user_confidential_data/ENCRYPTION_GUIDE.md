@@ -23,9 +23,15 @@ environment:
 - Go to: `/admin/config/user-confidential-data/encryption`
 - Enter key and save
 
-**Option C: Docker Secrets**
+**Option C: Docker Secrets (Production)**
 ```bash
-docker secret create user_confidential_data_key "your-key"
+# Create secret file (current setup)
+echo "your-32-byte-master-key-for-hkdf" > /var/www/drupal/secrets/user_confidential_data_key
+chmod 600 /var/www/drupal/secrets/user_confidential_data_key
+
+# Mount in docker-compose.yml
+volumes:
+  - ./secrets:/run/secrets:ro
 ```
 
 ### 2. Enable Module
@@ -46,12 +52,23 @@ $entity->save();
 
 ## 🔑 Key Management
 
+**Current Active Source: Docker Secrets** (Production-ready)
+
 **Priority order:**
-1. Docker secrets (production)
-2. Environment variable (recommended)
-3. Settings form (development)
+1. Docker secrets (`/run/secrets/user_confidential_data_key`) - **ACTIVE**
+2. Environment variable (`USER_CONFIDENTIAL_DATA_KEY`) - Disabled
+3. Drupal Settings (`$settings['user_confidential_data_encryption_key']`) - Fallback
 
 ## ✅ Verification
+
+**Check encryption status:**
+```bash
+# Verify encryption is ready
+docker exec drupal-drupal-1 /opt/drupal/vendor/bin/drush eval "print_r(\Drupal::service('user_confidential_data.field_encryption')->isEncryptionReady());"
+
+# Test encryption/decryption
+docker exec drupal-drupal-1 /opt/drupal/vendor/bin/drush eval "\$service = \Drupal::service('user_confidential_data.field_encryption'); \$test = 'test'; \$encrypted = \$service->encryptField(\$test); \$decrypted = \$service->decryptField(\$encrypted); print 'Match: ' . (\$test === \$decrypted ? 'YES' : 'NO');"
+```
 
 **Check database (should show encrypted data):**
 ```sql
@@ -75,14 +92,15 @@ echo $entity->get('password')->value; // Shows actual password
 ## 🛠️ Troubleshooting
 
 **"No encryption key found"**
-- Check environment variable: `echo $USER_CONFIDENTIAL_DATA_KEY`
+- Check Docker secrets: `docker exec drupal-drupal-1 cat /run/secrets/user_confidential_data_key`
+- Verify secret file exists: `ls -la /var/www/drupal/secrets/`
+- Check environment variable: `docker exec drupal-drupal-1 env | grep USER_CONFIDENTIAL_DATA_KEY`
 - Verify settings form configuration
-- Check Docker secrets if used
 
 **"Encryption failed"**
-- Ensure OpenSSL extension is enabled
-- Verify key is 32+ characters
-- Check Drupal logs for details
+- Ensure OpenSSL extension is enabled: `docker exec drupal-drupal-1 php -m | grep openssl`
+- Verify key is 32+ characters: `wc -c /var/www/drupal/secrets/user_confidential_data_key`
+- Check Drupal logs: `docker exec drupal-drupal-1 /opt/drupal/vendor/bin/drush watchdog-show`
 
 ## 📁 Key Files
 
