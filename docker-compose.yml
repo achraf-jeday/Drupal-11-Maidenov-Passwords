@@ -28,14 +28,14 @@ services:
       POSTGRES_USER: drupal
       POSTGRES_PASSWORD: drupal
       USER_CONFIDENTIAL_DATA_KEY: test-encryption-key-for-development-only
-      # REDIS_HOST: redis  # Uncomment this line to enable Redis
+      REDIS_HOST: redis  # Uncomment this line to enable Redis
       # REDIS_PASSWORD:    # Uncomment and set if Redis auth is needed
     volumes:
       - .:/opt/drupal
     working_dir: /opt/drupal/web
     depends_on:
       - db
-      # - redis  # Uncomment this line to enable Redis dependency
+      - redis  # Uncomment this line to enable Redis dependency
     restart: unless-stopped
 
   adminer:
