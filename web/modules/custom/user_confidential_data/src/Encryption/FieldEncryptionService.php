@@ -269,7 +269,6 @@ class FieldEncryptionService {
       'email',
       'username',
       'password',
-      'link',
       'notes',
     ];
   }

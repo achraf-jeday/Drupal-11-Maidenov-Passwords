@@ -86,23 +86,8 @@ class UserConfidentialDataStorage extends SqlContentEntityStorage {
     foreach ($values as $field_name => $field_values) {
       if ($this->isEncryptedField($field_name) && !empty($field_values)) {
         foreach ($field_values as $delta => $item_values) {
-          // Handle link fields specially
-          if ($field_name === 'link') {
-            if (isset($item_values['uri'])) {
-              $encrypted_uri = $this->encryptValue($item_values['uri']);
-              if ($encrypted_uri !== null) {
-                $values[$field_name][$delta]['uri'] = $encrypted_uri;
-              }
-            }
-            if (isset($item_values['title'])) {
-              $encrypted_title = $this->encryptValue($item_values['title']);
-              if ($encrypted_title !== null) {
-                $values[$field_name][$delta]['title'] = $encrypted_title;
-              }
-            }
-          }
-          // Handle other encrypted fields
-          elseif (isset($item_values['value'])) {
+          // Handle encrypted fields
+          if (isset($item_values['value'])) {
             $encrypted_value = $this->encryptValue($item_values['value']);
             if ($encrypted_value !== null) {
               $values[$field_name][$delta]['value'] = $encrypted_value;
@@ -321,23 +306,6 @@ class UserConfidentialDataStorage extends SqlContentEntityStorage {
             $field->value = $encrypted_value;
           }
         }
-        elseif ($field->getItemDefinition()->getClass() === 'Drupal\Core\Field\Plugin\Field\FieldType\LinkItem') {
-          // For link fields
-          $url = $field->uri;
-          $title = $field->title;
-          $options = $field->options;
-
-          $encrypted_url = $encryption_service->encryptField($url);
-          $encrypted_title = $encryption_service->encryptField($title);
-
-          if ($encrypted_url !== null) {
-            $field->uri = $encrypted_url;
-          }
-          if ($encrypted_title !== null) {
-            $field->title = $encrypted_title;
-          }
-          // Note: options are not encrypted as they contain technical data
-        }
         elseif ($field->getItemDefinition()->getClass() === 'Drupal\Core\Field\Plugin\Field\FieldType\StringLongItem') {
           // For long text fields
           $value = $field->value;
@@ -381,21 +349,6 @@ class UserConfidentialDataStorage extends SqlContentEntityStorage {
           $decrypted_value = $encryption_service->decryptField($encrypted_value);
           if ($decrypted_value !== null) {
             $field->value = $decrypted_value;
-          }
-        }
-        elseif ($field->getItemDefinition()->getClass() === 'Drupal\Core\Field\Plugin\Field\FieldType\LinkItem') {
-          // For link fields
-          $encrypted_url = $field->uri;
-          $encrypted_title = $field->title;
-
-          $decrypted_url = $encryption_service->decryptField($encrypted_url);
-          $decrypted_title = $encryption_service->decryptField($encrypted_title);
-
-          if ($decrypted_url !== null) {
-            $field->uri = $decrypted_url;
-          }
-          if ($decrypted_title !== null) {
-            $field->title = $decrypted_title;
           }
         }
         elseif ($field->getItemDefinition()->getClass() === 'Drupal\Core\Field\Plugin\Field\FieldType\StringLongItem') {

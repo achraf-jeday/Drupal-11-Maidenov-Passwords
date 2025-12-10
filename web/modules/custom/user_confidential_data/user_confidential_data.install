@@ -22,7 +22,7 @@ function user_confidential_data_update_8001() {
 
   // Check if we need to encrypt existing data
   $existing_data = $database->select('user_confidential_data', 'ucd')
-    ->fields('ucd', ['id', 'name', 'email', 'username', 'password', 'link__uri', 'link__title', 'notes'])
+    ->fields('ucd', ['id', 'name', 'email', 'username', 'password', 'notes'])
     ->range(0, 1)
     ->execute()
     ->fetchAssoc();
@@ -57,22 +57,6 @@ function user_confidential_data_update_8001() {
                 ->condition('id', $row->id)
                 ->execute();
             }
-          }
-        }
-
-        // Handle link field separately (it's stored in a separate table)
-        if (!empty($row->link__uri)) {
-          $encrypted_uri = $encryption_service->encryptField($row->link__uri);
-          $encrypted_title = $encryption_service->encryptField($row->link__title);
-
-          if ($encrypted_uri !== null) {
-            $database->update('user_confidential_data__link')
-              ->fields([
-                'link__uri' => $encrypted_uri,
-                'link__title' => $encrypted_title ?: '',
-              ])
-              ->condition('entity_id', $row->id)
-              ->execute();
           }
         }
       }

@@ -296,30 +296,6 @@ class UserConfidentialData extends ContentEntityBase implements UserConfidential
       ->setRevisionable(TRUE)
       ->setTranslatable(TRUE);
 
-    // Add the Link field
-    $fields['link'] = BaseFieldDefinition::create('link')
-      ->setLabel(t('Link'))
-      ->setDescription(t('The link associated with this confidential data.'))
-      ->setRevisionable(TRUE)
-      ->setTranslatable(TRUE)
-      ->setSettings([
-        'link_type' => 17, // External and internal links
-        'title' => 'optional', // Optional title
-      ])
-      ->setDefaultValue('')
-      ->setRequired(FALSE)
-      ->setDisplayOptions('view', [
-        'label' => 'visible',
-        'type' => 'link',
-        'weight' => 1,
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'link_default',
-        'weight' => 1,
-      ])
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
-
     // Add the Username field
     $fields['username'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Username'))

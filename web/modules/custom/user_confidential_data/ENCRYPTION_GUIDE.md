@@ -6,7 +6,6 @@ Automatic field-level encryption for your UserConfidentialData entity using AES-
 
 **What's encrypted:**
 - name, email, username, password, notes ✅
-- link fields (URI/title) ⚠️ *Plain text in DB due to Drupal limitations*
 
 ## 🚀 Setup (5 minutes)
 
