@@ -23,25 +23,36 @@ environment:
 - Go to: `/admin/config/user-confidential-data/encryption`
 - Enter key and save
 
-**Option C: Docker Secrets (Production)**
+**Option C: Docker Secrets (Production - Maximum Security)**
 ```bash
-# 1. Generate cryptographically secure key
+# 1. Generate cryptographically secure key (one-time setup)
 openssl rand -hex 32 > /var/www/drupal/secrets/user_confidential_data_key
 chmod 600 /var/www/drupal/secrets/user_confidential_data_key
 chmod 700 /var/www/drupal/secrets/
 
-# 2. Mount as tmpfs in docker-compose.yml (maximum security)
+# 2. Mount as tmpfs in docker-compose.yml (maximum security - already configured)
 volumes:
   - type: tmpfs
     target: /run/secrets
     tmpfs:
       size: 1000000  # 1MB
 
-# 3. Copy key to container
-docker cp /var/www/drupal/secrets/user_confidential_data_key drupal-drupal-1:/run/secrets/
+# 3. Copy key to container (REQUIRED after each container restart)
+# NOTE: docker cp doesn't work reliably with tmpfs, use pipe method instead:
+cat /var/www/drupal/secrets/user_confidential_data_key | docker exec -i drupal-drupal-1 tee /run/secrets/user_confidential_data_key > /dev/null
 docker exec drupal-drupal-1 chmod 600 /run/secrets/user_confidential_data_key
 docker exec drupal-drupal-1 chown www-data:www-data /run/secrets/user_confidential_data_key
+
+# 4. Verify the key is in place
+docker exec drupal-drupal-1 ls -la /run/secrets/user_confidential_data_key
+# Expected: -rw------- 1 www-data www-data 65 [date] user_confidential_data_key
 ```
+
+**Why tmpfs is maximum security:**
+- Key only exists in RAM, never written to disk
+- Automatically deleted when container stops/restarts
+- No risk of key exposure through disk forensics or backups
+- Isolated memory space per container
 
 ### 2. Enable Module
 ```bash
