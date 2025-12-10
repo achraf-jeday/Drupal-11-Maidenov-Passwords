@@ -49,5 +49,6 @@ web/themes/contrib
 # Ignore .idea (JetBrains)
 .idea
 
-# Ignore database backups
-database-backups/
+# Ignore database backup files but keep the directory
+database-backups/*.sql
+database-backups/*.sql.gz

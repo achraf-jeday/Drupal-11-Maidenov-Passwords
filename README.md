@@ -360,6 +360,75 @@ curl -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9..." \
 - **Admin User**: `admin`
 - **Admin Password**: `admin`
 
+## 💾 Database Backup & Restore
+
+### Creating a Database Backup
+
+Create a timestamped backup of the PostgreSQL database:
+
+```bash
+docker exec drupal-db-1 pg_dump -U drupal drupal > /var/www/drupal/database-backups/drupal_backup_$(date +%Y-%m-%d_%H-%M-%S).sql
+```
+
+**Example backup filename:** `drupal_backup_2025-12-10_14-14-33.sql`
+
+**Backup Location:** All backups are stored in `/var/www/drupal/database-backups/`
+
+### Restoring a Database Backup
+
+To restore the website from a database backup, follow these steps:
+
+**Step 1: Drop the existing database**
+```bash
+docker exec drupal-db-1 psql -U drupal -d postgres -c "DROP DATABASE IF EXISTS drupal;"
+```
+
+**Step 2: Create a new database**
+```bash
+docker exec drupal-db-1 psql -U drupal -d postgres -c "CREATE DATABASE drupal OWNER drupal;"
+```
+
+**Step 3: Import the backup**
+```bash
+cat /var/www/drupal/database-backups/drupal_backup_2025-12-10_14-14-33.sql | docker exec -i drupal-db-1 psql -U drupal -d drupal
+```
+*Replace the filename with your actual backup file.*
+
+**Step 4: Import configuration and clear cache**
+```bash
+docker exec drupal-drupal-1 drush cim -y
+docker exec drupal-drupal-1 drush cr
+```
+
+### Backup Best Practices
+
+- **Regular Backups**: Create backups before major changes or deployments
+- **Naming Convention**: Use timestamps for easy identification (`YYYY-MM-DD_HH-MM-SS`)
+- **Storage**: Keep backups in a secure location with proper permissions
+- **Testing**: Periodically test backup restoration to ensure data integrity
+- **Retention**: Keep multiple backups for different restore points
+
+### Automated Backup Script
+
+Create a simple backup script (`backup.sh`):
+
+```bash
+#!/bin/bash
+BACKUP_DIR="/var/www/drupal/database-backups"
+TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
+BACKUP_FILE="$BACKUP_DIR/drupal_backup_$TIMESTAMP.sql"
+
+# Create backup
+docker exec drupal-db-1 pg_dump -U drupal drupal > "$BACKUP_FILE"
+
+# Set proper permissions
+chmod 644 "$BACKUP_FILE"
+
+echo "Backup created: $BACKUP_FILE"
+```
+
+Make it executable: `chmod +x backup.sh`
+
 ## 🔐 Encryption
 
 Field-level encryption is implemented for the UserConfidentialData module. The system uses Docker Secrets with maximum security:
