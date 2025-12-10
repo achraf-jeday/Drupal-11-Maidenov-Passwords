@@ -342,6 +342,29 @@ class UserConfidentialData extends ContentEntityBase implements UserConfidential
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
+    // Add the Link field
+    $fields['link'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Link'))
+      ->setDescription(t('The link associated with this confidential data.'))
+      ->setRevisionable(TRUE)
+      ->setSettings([
+        'max_length' => 2048,
+        'text_processing' => 0,
+      ])
+      ->setDefaultValue('')
+      ->setRequired(FALSE)
+      ->setDisplayOptions('view', [
+        'label' => 'visible',
+        'type' => 'string',
+        'weight' => 4,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'url',
+        'weight' => 4,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
     // Add the Notes field
     $fields['notes'] = BaseFieldDefinition::create('string_long')
       ->setLabel(t('Notes'))
@@ -353,11 +376,11 @@ class UserConfidentialData extends ContentEntityBase implements UserConfidential
       ->setDisplayOptions('view', [
         'label' => 'visible',
         'type' => 'basic_string',
-        'weight' => 4,
+        'weight' => 5,
       ])
       ->setDisplayOptions('form', [
         'type' => 'string_textarea',
-        'weight' => 4,
+        'weight' => 5,
         'settings' => [
           'rows' => 4,
         ],
