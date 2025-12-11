@@ -1,0 +1,15 @@
+uuid: 2ac62b00-2b85-4067-9d18-f77c1bafa5cf
+langcode: en
+status: true
+dependencies:
+  module:
+    - user_confidential_data
+id: confidential_data_user
+label: 'Confidential data user'
+weight: 4
+is_admin: false
+permissions:
+  - 'create user confidential data'
+  - 'delete own user confidential data'
+  - 'edit own user confidential data'
+  - 'view own user confidential data'

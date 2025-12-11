@@ -17,6 +17,12 @@ class UserConfidentialDataAccessControlHandler extends EntityAccessControlHandle
    */
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     /** @var \Drupal\user_confidential_data\Entity\UserConfidentialData $entity */
+
+    // Super admin (uid=1) has access to everything.
+    if ($account->id() == 1) {
+      return AccessResult::allowed()->cachePerUser();
+    }
+
     switch ($operation) {
       case 'view':
         // Block direct browser access to canonical route.
@@ -25,13 +31,38 @@ class UserConfidentialDataAccessControlHandler extends EntityAccessControlHandle
         if ($route_name === 'entity.user_confidential_data.canonical') {
           return AccessResult::forbidden('Direct viewing of confidential data via browser is not allowed.');
         }
-        return AccessResult::allowedIfHasPermission($account, 'view user confidential data');
+
+        // Check for own view permission.
+        if ($account->hasPermission('view own user confidential data')) {
+          $is_owner = $entity->get('user_id')->target_id == $account->id();
+          return AccessResult::allowedIf($is_owner)
+            ->cachePerPermissions()
+            ->addCacheableDependency($entity);
+        }
+
+        return AccessResult::neutral();
 
       case 'update':
-        return AccessResult::allowedIfHasPermission($account, 'edit user confidential data');
+        // Check for own edit permission.
+        if ($account->hasPermission('edit own user confidential data')) {
+          $is_owner = $entity->get('user_id')->target_id == $account->id();
+          return AccessResult::allowedIf($is_owner)
+            ->cachePerPermissions()
+            ->addCacheableDependency($entity);
+        }
+
+        return AccessResult::neutral();
 
       case 'delete':
-        return AccessResult::allowedIfHasPermission($account, 'delete user confidential data');
+        // Check for own delete permission.
+        if ($account->hasPermission('delete own user confidential data')) {
+          $is_owner = $entity->get('user_id')->target_id == $account->id();
+          return AccessResult::allowedIf($is_owner)
+            ->cachePerPermissions()
+            ->addCacheableDependency($entity);
+        }
+
+        return AccessResult::neutral();
     }
 
     return AccessResult::neutral();

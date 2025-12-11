@@ -1,0 +1,14 @@
+uuid: 3326d04f-8606-4c49-9810-0ebec70b1b87
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.confidential_data_user
+  module:
+    - user
+id: user_add_role_action.confidential_data_user
+label: 'Add the Confidential data user role to the selected user(s)'
+type: user
+plugin: user_add_role_action
+configuration:
+  rid: confidential_data_user

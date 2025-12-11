@@ -2,18 +2,18 @@ administer user confidential data:
   title: 'Administer user confidential data'
   description: 'Administer user confidential data types and settings.'
 
-view user confidential data:
-  title: 'View user confidential data'
-  description: 'View user confidential data entities via API.'
+view own user confidential data:
+  title: 'View own user confidential data'
+  description: 'View your own user confidential data entities via API.'
 
-edit user confidential data:
-  title: 'Edit user confidential data'
-  description: 'Edit user confidential data entities.'
+edit own user confidential data:
+  title: 'Edit own user confidential data'
+  description: 'Edit your own user confidential data entities.'
 
 create user confidential data:
   title: 'Create user confidential data'
-  description: 'Create user confidential data entities.'
+  description: 'Create new user confidential data entities.'
 
-delete user confidential data:
-  title: 'Delete user confidential data'
-  description: 'Delete user confidential data entities.'
+delete own user confidential data:
+  title: 'Delete own user confidential data'
+  description: 'Delete your own user confidential data entities.'

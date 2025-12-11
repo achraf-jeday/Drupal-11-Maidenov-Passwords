@@ -1,0 +1,14 @@
+uuid: 8e9c4e62-0435-4336-94bf-af9dee0ed419
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.confidential_data_user
+  module:
+    - user
+id: user_remove_role_action.confidential_data_user
+label: 'Remove the Confidential data user role from the selected user(s)'
+type: user
+plugin: user_remove_role_action
+configuration:
+  rid: confidential_data_user
