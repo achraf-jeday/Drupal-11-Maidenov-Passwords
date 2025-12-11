@@ -19,9 +19,9 @@ class UserConfidentialDataAccessControlHandler extends EntityAccessControlHandle
     /** @var \Drupal\user_confidential_data\Entity\UserConfidentialData $entity */
     switch ($operation) {
       case 'view':
-        // Deny all direct entity viewing - confidential data should only
-        // be accessed via API with proper authentication.
-        return AccessResult::forbidden('Direct viewing of confidential data is not allowed.');
+        // Allow viewing via API/programmatic access (JSON:API, etc.)
+        // Note: No canonical route exists, so no browser-accessible view page.
+        return AccessResult::allowedIfHasPermission($account, 'view user confidential data');
 
       case 'update':
         return AccessResult::allowedIfHasPermission($account, 'edit user confidential data');

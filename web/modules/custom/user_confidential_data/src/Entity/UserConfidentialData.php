@@ -58,7 +58,6 @@ use Drupal\user\EntityOwnerTrait;
  *     "collection" = "/admin/content/user-confidential-data",
  *     "add-page" = "/admin/content/user-confidential-data/add",
  *     "add-form" = "/admin/content/user-confidential-data/add/{user_confidential_data_type}",
- *     "canonical" = "/user-confidential-data/{user_confidential_data}",
  *     "edit-form" = "/admin/content/user-confidential-data/{user_confidential_data}/edit",
  *     "delete-form" = "/admin/content/user-confidential-data/{user_confidential_data}/delete",
  *     "version-history" = "/admin/content/user-confidential-data/{user_confidential_data}/revisions",

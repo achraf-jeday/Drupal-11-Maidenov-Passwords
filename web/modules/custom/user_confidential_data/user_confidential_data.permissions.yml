@@ -4,7 +4,7 @@ administer user confidential data:
 
 view user confidential data:
   title: 'View user confidential data'
-  description: 'View user confidential data entities.'
+  description: 'View user confidential data entities via API.'
 
 edit user confidential data:
   title: 'Edit user confidential data'
