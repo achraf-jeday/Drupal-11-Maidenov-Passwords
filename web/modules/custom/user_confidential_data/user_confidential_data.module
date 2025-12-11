@@ -7,3 +7,37 @@
  * Filtering on encrypted fields is handled by the custom Query class.
  * @see \Drupal\user_confidential_data\Entity\Query\Sql\Query
  */
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_form_FORM_ID_alter() for user_login_form.
+ */
+function user_confidential_data_form_user_login_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Add custom validation handler at the beginning of the validation chain.
+  array_unshift($form['#validate'], 'user_confidential_data_user_login_validate');
+}
+
+/**
+ * Custom validation handler for user login form.
+ *
+ * Restricts standard login form access to admin user (uid=1) only.
+ * All other users must authenticate via OAuth.
+ */
+function user_confidential_data_user_login_validate(array &$form, FormStateInterface $form_state) {
+  $username = $form_state->getValue('name');
+
+  // Load user by username.
+  $users = \Drupal::entityTypeManager()
+    ->getStorage('user')
+    ->loadByProperties(['name' => $username]);
+
+  if (!empty($users)) {
+    $user = reset($users);
+
+    // Block login if user is not admin (uid != 1).
+    if ($user->id() != 1) {
+      $form_state->setErrorByName('name', t('Standard login is disabled. Please use OAuth authentication.'));
+    }
+  }
+}
