@@ -19,7 +19,6 @@ class UserConfidentialDataListBuilder extends EntityListBuilder {
     $header['name'] = $this->t('Name');
     $header['user'] = $this->t('User');
     $header['created'] = $this->t('Created');
-    $header['status'] = $this->t('Status');
     $header['operations'] = $this->t('Operations');
     return $header + parent::buildHeader();
   }
@@ -43,9 +42,6 @@ class UserConfidentialDataListBuilder extends EntityListBuilder {
     $created_time = $entity->getCreatedTime();
     $row['created'] = (string) ($created_time ? \Drupal::service('date.formatter')->format($created_time, 'short') : $this->t('Not set'));
 
-    // Safely get the status
-    $row['status'] = (string) ($entity->isPublished() ? $this->t('Published') : $this->t('Unpublished'));
-
     // Add the operations column manually to ensure it works
     $operations = [
       'data' => [
@@ -53,14 +49,6 @@ class UserConfidentialDataListBuilder extends EntityListBuilder {
         '#links' => [],
       ],
     ];
-
-    // Add View operation
-    if ($entity->access('view')) {
-      $operations['data']['#links']['view'] = [
-        'title' => (string) $this->t('View'),
-        'url' => $entity->toUrl('canonical'),
-      ];
-    }
 
     // Add Edit operation
     if ($entity->access('update')) {

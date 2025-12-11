@@ -158,7 +158,6 @@ for ($i = 1; $i <= 250; $i++) {
     'password' => $password,
     'link' => $link,
     'notes' => $notes,
-    'status' => 1,
   ]);
 
   $entity->save();

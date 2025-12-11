@@ -4,7 +4,6 @@ namespace Drupal\user_confidential_data\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
-use Drupal\Core\Entity\EntityPublishedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -75,7 +74,6 @@ class UserConfidentialData extends ContentEntityBase implements UserConfidential
 
   use EntityChangedTrait;
   use EntityOwnerTrait;
-  use EntityPublishedTrait;
 
   /**
    * {@inheritdoc}
@@ -132,29 +130,6 @@ class UserConfidentialData extends ContentEntityBase implements UserConfidential
    */
   public function setCreatedTime($timestamp) {
     $this->set('created', $timestamp);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function isPublished() {
-    return (bool) $this->getEntityKey('status');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setPublished() {
-    $this->set('status', TRUE);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setUnpublished() {
-    $this->set('status', FALSE);
     return $this;
   }
 
@@ -253,16 +228,6 @@ class UserConfidentialData extends ContentEntityBase implements UserConfidential
       ->setDescription(t('The time that the user confidential data was last edited.'))
       ->setRevisionable(TRUE)
       ->setTranslatable(TRUE);
-
-    // Add the status field for publishing
-    $fields['status'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Status'))
-      ->setDescription(t('A boolean indicating whether the User Confidential Data is published.'))
-      ->setDefaultValue(TRUE)
-      ->setDisplayOptions('form', [
-        'type' => 'boolean_checkbox',
-        'weight' => 100,
-      ]);
 
     // Revision metadata fields - required for revision functionality
     $fields['revision_user'] = BaseFieldDefinition::create('entity_reference')
