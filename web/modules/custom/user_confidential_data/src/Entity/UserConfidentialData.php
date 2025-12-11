@@ -58,6 +58,7 @@ use Drupal\user\EntityOwnerTrait;
  *     "collection" = "/admin/content/user-confidential-data",
  *     "add-page" = "/admin/content/user-confidential-data/add",
  *     "add-form" = "/admin/content/user-confidential-data/add/{user_confidential_data_type}",
+ *     "canonical" = "/user-confidential-data/{user_confidential_data}",
  *     "edit-form" = "/admin/content/user-confidential-data/{user_confidential_data}/edit",
  *     "delete-form" = "/admin/content/user-confidential-data/{user_confidential_data}/delete",
  *     "version-history" = "/admin/content/user-confidential-data/{user_confidential_data}/revisions",
@@ -130,6 +131,28 @@ class UserConfidentialData extends ContentEntityBase implements UserConfidential
   public function setCreatedTime($timestamp) {
     $this->set('created', $timestamp);
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasLinkTemplate($key) {
+    // Treat canonical as if it exists (we'll redirect it in toUrl()).
+    if ($key === 'canonical') {
+      return TRUE;
+    }
+    return parent::hasLinkTemplate($key);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function toUrl($rel = 'canonical', array $options = []) {
+    // Redirect canonical requests to collection since we don't have a view page.
+    if ($rel === 'canonical') {
+      return \Drupal\Core\Url::fromRoute('entity.user_confidential_data.collection', [], $options);
+    }
+    return parent::toUrl($rel, $options);
   }
 
   /**
