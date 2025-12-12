@@ -9,6 +9,66 @@
  */
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Database\Query\AlterableInterface;
+
+/**
+ * Implements hook_query_TAG_alter() for user_confidential_data_access.
+ *
+ * Filters user_confidential_data entity queries to show only owned entities
+ * for non-admin users. This ensures JSON:API and other entity lists are
+ * properly filtered by ownership.
+ *
+ * WHEN THIS RUNS:
+ * - Any EntityQuery on user_confidential_data entities with the access tag
+ * - JSON:API collection requests
+ * - Entity reference autocomplete
+ * - Views (if configured to check entity access)
+ *
+ * WHAT IT DOES:
+ * - Super admin (uid=1): No filtering, sees all entities
+ * - Regular users: Filters to show only entities where user_id = current user
+ * - Applies to both the main query AND the count query
+ */
+function user_confidential_data_query_user_confidential_data_access_alter(AlterableInterface $query) {
+  $account = \Drupal::currentUser();
+
+  // Super admin (uid = 1) can see everything - no filtering needed.
+  if ($account->id() == 1) {
+    return;
+  }
+
+  // Check if user has any "own" permissions.
+  $has_own_permission = $account->hasPermission('view own user confidential data')
+    || $account->hasPermission('edit own user confidential data')
+    || $account->hasPermission('delete own user confidential data');
+
+  // Get the base table alias.
+  $tables = $query->getTables();
+  $base_table = '';
+  foreach ($tables as $table_info) {
+    if (isset($table_info['table']) && $table_info['table'] === 'user_confidential_data') {
+      $base_table = $table_info['alias'];
+      break;
+    }
+  }
+
+  if (!$base_table) {
+    return;
+  }
+
+  // If user has "own" permissions, filter by ownership.
+  if ($has_own_permission) {
+    // Add WHERE condition: user_id = current user ID.
+    // This filters the query to show only entities owned by the current user.
+    $query->condition($base_table . '.user_id', $account->id());
+  }
+  else {
+    // User has no permissions to view any entities.
+    // Add an impossible condition to return empty result.
+    // Use a condition that will never match (entity ID cannot be NULL).
+    $query->isNull($base_table . '.id');
+  }
+}
 
 /**
  * Implements hook_form_FORM_ID_alter() for user_login_form.

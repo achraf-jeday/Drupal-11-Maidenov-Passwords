@@ -25,13 +25,6 @@ class UserConfidentialDataAccessControlHandler extends EntityAccessControlHandle
 
     switch ($operation) {
       case 'view':
-        // Block direct browser access to canonical route.
-        // Allow API access (JSON:API checks this permission programmatically).
-        $route_name = \Drupal::routeMatch()->getRouteName();
-        if ($route_name === 'entity.user_confidential_data.canonical') {
-          return AccessResult::forbidden('Direct viewing of confidential data via browser is not allowed.');
-        }
-
         // Check for own view permission.
         if ($account->hasPermission('view own user confidential data')) {
           $is_owner = $entity->get('user_id')->target_id == $account->id();
