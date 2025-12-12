@@ -71,6 +71,110 @@ function user_confidential_data_query_user_confidential_data_access_alter(Altera
 }
 
 /**
+ * Implements hook_query_TAG_alter() for edit access.
+ *
+ * Filters user_confidential_data entity queries for edit operations.
+ * Ensures users can only edit their own entities.
+ *
+ * WHEN THIS RUNS:
+ * - EntityQuery with user_confidential_data_edit_access tag
+ * - Bulk edit operations via EntityQuery
+ *
+ * WHAT IT DOES:
+ * - Super admin (uid=1): No filtering, can edit all entities
+ * - Regular users: Filters to show only entities where user_id = current user
+ * - Users without edit permission: Returns empty result
+ */
+function user_confidential_data_query_user_confidential_data_edit_access_alter(AlterableInterface $query) {
+  $account = \Drupal::currentUser();
+
+  // Super admin (uid = 1) can edit everything - no filtering needed.
+  if ($account->id() == 1) {
+    return;
+  }
+
+  // Check if user has edit own permission.
+  $has_edit_permission = $account->hasPermission('edit own user confidential data');
+
+  // Get the base table alias.
+  $tables = $query->getTables();
+  $base_table = '';
+  foreach ($tables as $table_info) {
+    if (isset($table_info['table']) && $table_info['table'] === 'user_confidential_data') {
+      $base_table = $table_info['alias'];
+      break;
+    }
+  }
+
+  if (!$base_table) {
+    return;
+  }
+
+  // If user has edit permission, filter by ownership.
+  if ($has_edit_permission) {
+    // Add WHERE condition: user_id = current user ID.
+    $query->condition($base_table . '.user_id', $account->id());
+  }
+  else {
+    // User cannot edit any entities.
+    // Add an impossible condition to return empty result.
+    $query->isNull($base_table . '.id');
+  }
+}
+
+/**
+ * Implements hook_query_TAG_alter() for delete access.
+ *
+ * Filters user_confidential_data entity queries for delete operations.
+ * Ensures users can only delete their own entities.
+ *
+ * WHEN THIS RUNS:
+ * - EntityQuery with user_confidential_data_delete_access tag
+ * - Bulk delete operations via EntityQuery
+ *
+ * WHAT IT DOES:
+ * - Super admin (uid=1): No filtering, can delete all entities
+ * - Regular users: Filters to show only entities where user_id = current user
+ * - Users without delete permission: Returns empty result
+ */
+function user_confidential_data_query_user_confidential_data_delete_access_alter(AlterableInterface $query) {
+  $account = \Drupal::currentUser();
+
+  // Super admin (uid = 1) can delete everything - no filtering needed.
+  if ($account->id() == 1) {
+    return;
+  }
+
+  // Check if the user has the delete own permission.
+  $has_delete_permission = $account->hasPermission('delete own user confidential data');
+
+  // Get the base table alias.
+  $tables = $query->getTables();
+  $base_table = '';
+  foreach ($tables as $table_info) {
+    if (isset($table_info['table']) && $table_info['table'] === 'user_confidential_data') {
+      $base_table = $table_info['alias'];
+      break;
+    }
+  }
+
+  if (!$base_table) {
+    return;
+  }
+
+  // If the user has the delete permission, filter by ownership.
+  if ($has_delete_permission) {
+    // Add WHERE condition: user_id = current user ID.
+    $query->condition($base_table . '.user_id', $account->id());
+  }
+  else {
+    // User cannot delete any entities.
+    // Add an impossible condition to return empty result.
+    $query->isNull($base_table . '.id');
+  }
+}
+
+/**
  * Implements hook_form_FORM_ID_alter() for user_login_form.
  */
 function user_confidential_data_form_user_login_form_alter(&$form, FormStateInterface $form_state, $form_id) {

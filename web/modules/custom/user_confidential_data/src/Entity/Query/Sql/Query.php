@@ -3,11 +3,24 @@
 namespace Drupal\user_confidential_data\Entity\Query\Sql;
 
 use Drupal\Core\Entity\Query\Sql\Query as BaseQuery;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Database\Connection;
 
 /**
  * Custom entity query for user_confidential_data with encrypted field support.
  */
 class Query extends BaseQuery {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct(EntityTypeInterface $entity_type, $conjunction, Connection $database, array $namespaces) {
+    parent::__construct($entity_type, $conjunction, $database, $namespaces);
+
+    // Add access control tag for query-level filtering.
+    // This ensures that all encrypted field queries automatically include ownership filtering.
+    $this->addTag('user_confidential_data_access');
+  }
 
   /**
    * {@inheritdoc}
