@@ -19,9 +19,10 @@ services:
     command: redis-server --appendonly yes
 
   drupal:
-    image: drupal:11-apache
+    image: drupal-xdebug
     ports:
       - "8080:80"
+      - "9003:9003"
     environment:
       POSTGRES_HOST: db
       POSTGRES_DB: drupal

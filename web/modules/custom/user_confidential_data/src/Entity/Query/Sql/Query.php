@@ -49,7 +49,11 @@ class Query extends BaseQuery {
     // Copy only non-encrypted conditions to the clean query.
     $this->copyNonEncryptedConditions($this->condition, $clean_query, $encrypted_fields);
 
-    // Execute the clean query with only non-encrypted conditions.
+    // DO NOT copy pagination to clean query when filtering encrypted fields.
+    // We need to load all matching entities first, then filter by encrypted fields,
+    // and THEN apply pagination. This ensures that pagination respects the encrypted field filters.
+
+    // Execute the clean query with only non-encrypted conditions (NO PAGINATION).
     $result = $clean_query->execute();
 
     // If no results, return empty array.
@@ -66,6 +70,27 @@ class Query extends BaseQuery {
       if ($this->matchesEncryptedConditions($entity, $encrypted_conditions)) {
         $filtered_ids[] = $entity->id();
       }
+    }
+
+    // Apply pagination AFTER filtering encrypted fields
+    if ($this->pager && !empty($this->pager['limit']) && !$this->count) {
+      // Get total count for pager (this is the count AFTER encrypted field filtering)
+      $count_query = clone $this;
+      $this->pager['total'] = $count_query->count()->execute();
+
+      // Apply offset and limit to the filtered results
+      if (!empty($this->pager['total'])) {
+        $page = \Drupal::service('pager.parameters')->findPage($this->pager['element']);
+        $offset = $page * $this->pager['limit'];
+        $filtered_ids = array_slice($filtered_ids, $offset, $this->pager['limit']);
+
+        // Initialize pager service
+        \Drupal::service('pager.manager')->createPager($this->pager['total'], $this->pager['limit'], $this->pager['element']);
+      }
+    }
+    elseif ($this->range) {
+      // Apply range (LIMIT/OFFSET) after filtering
+      $filtered_ids = array_slice($filtered_ids, $this->range['start'], $this->range['length']);
     }
 
     return $filtered_ids;
