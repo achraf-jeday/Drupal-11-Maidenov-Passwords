@@ -22,4 +22,4 @@ umbrella: false
 parent: _none
 granularity_id: role
 granularity_configuration:
-  role: administrator
+  role: confidential_data_user
