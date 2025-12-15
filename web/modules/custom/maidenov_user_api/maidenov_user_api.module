@@ -30,7 +30,7 @@ function maidenov_user_api_form_user_form_alter(&$form, FormStateInterface $form
   $form['packing_key_section'] = [
     '#type' => 'details',
     '#title' => t('Packing Key Management'),
-    '#open' => FALSE,
+    '#open' => TRUE,
     '#weight' => 10,
     '#tree' => FALSE,
   ];

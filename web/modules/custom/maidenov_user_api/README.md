@@ -1,6 +1,17 @@
 # Maidenov User API
 
-This module provides REST API endpoints for user registration and packing key management for the Maidenov Passwords application.
+This module provides REST API endpoints for user registration and packing key management for the **Maidenov Passwords** application.
+
+## Overview
+
+The Packing Key is a user-defined master key used by the frontend application to **encrypt and decrypt confidential password data**. This key is:
+- Entered by the user in the frontend
+- Hashed and stored securely in Drupal (using Bcrypt/Argon2)
+- Never stored in plain text
+- Used to validate the user's key before allowing access to encrypted data
+- Essential for the security model of the password manager
+
+The module provides four REST endpoints for managing user accounts and packing keys, plus a backend form for administrative management.
 
 ## Features
 
@@ -31,7 +42,7 @@ This module provides REST API endpoints for user registration and packing key ma
 ### 2. Packing Key Update Endpoint
 - **Endpoint**: `POST /api/user/packing-key`
 - **Access**: Authenticated users only (OAuth2 protected)
-- **Purpose**: Set or update the user's encrypted packing key from the frontend
+- **Purpose**: Set or update the user's packing key (master key for encrypting/decrypting confidential password data in the frontend)
 
 **Request Body**:
 ```json
@@ -53,7 +64,7 @@ This module provides REST API endpoints for user registration and packing key ma
 ### 3. Packing Key Validation Endpoint
 - **Endpoint**: `POST /api/user/validate-packing-key`
 - **Access**: Authenticated users only
-- **Purpose**: Validate if the provided packing key is correct (used to unlock encrypted data)
+- **Purpose**: Validate if the provided packing key is correct (required before the frontend can decrypt and display the user's stored passwords)
 
 **Request Body**:
 ```json
@@ -81,7 +92,7 @@ This module provides REST API endpoints for user registration and packing key ma
 ### 4. Check Packing Key Exists Endpoint
 - **Endpoint**: `GET /api/user/packing-key/exists`
 - **Access**: Authenticated users only
-- **Purpose**: Check if the user has set a packing key (used after login to determine if setup is required)
+- **Purpose**: Check if the user has set a packing key (determines if user needs to create a packing key or validate an existing one to access encrypted data)
 
 **Response** (200 OK):
 ```json
@@ -101,16 +112,217 @@ This module provides REST API endpoints for user registration and packing key ma
 
 ## User Flow
 
-The typical user flow with these endpoints:
+The typical user flow with encryption/decryption workflow:
 
 1. **Registration**: User registers via `POST /api/register`
-2. **Login**: User authenticates (via OAuth)
+2. **Login**: User authenticates (via OAuth2)
 3. **Check Packing Key**: Frontend calls `GET /api/user/packing-key/exists`
    - If `exists: false` → Redirect to packing key setup
    - If `exists: true` → Prompt for packing key validation
-4. **Set Packing Key** (first time): User sets packing key via `POST /api/user/packing-key`
-5. **Validate Packing Key** (subsequent logins): User validates via `POST /api/user/validate-packing-key`
-6. **Access Protected Data**: Once validated, user can view/edit/delete their encrypted passwords
+4. **Set Packing Key** (first time):
+   - User creates a packing key via `POST /api/user/packing-key`
+   - Frontend uses this key to encrypt password data before storing
+5. **Validate Packing Key** (subsequent logins):
+   - User enters their packing key in the frontend
+   - Frontend validates via `POST /api/user/validate-packing-key`
+   - If valid, frontend uses this key to decrypt stored passwords
+6. **Access Protected Data**: Once packing key is validated, the frontend can decrypt and display the user's stored passwords, and encrypt any new passwords before storing them
+
+## Testing the Endpoints (Command Line)
+
+Here are practical curl examples for testing all four endpoints from the command line:
+
+### Prerequisites
+
+Set your base URL as a variable (adjust as needed):
+```bash
+BASE_URL="https://localhost"
+```
+
+### 1. Test User Registration
+
+Register a new user (no authentication required):
+
+```bash
+curl -X POST "${BASE_URL}/api/register" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "testuser@example.com",
+    "password": "SecurePass123!",
+    "username": "testuser"
+  }'
+```
+
+**Expected Response**:
+```json
+{
+  "message": "User registered successfully.",
+  "uid": 2,
+  "email": "testuser@example.com",
+  "username": "testuser"
+}
+```
+
+### 2. Get OAuth Token (For Authenticated Requests)
+
+Before testing the authenticated endpoints, you need an OAuth2 access token. Example:
+
+```bash
+TOKEN=$(curl -X POST "${BASE_URL}/oauth/token" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=password" \
+  -d "client_id=YOUR_CLIENT_ID" \
+  -d "client_secret=YOUR_CLIENT_SECRET" \
+  -d "username=testuser@example.com" \
+  -d "password=SecurePass123!" \
+  | jq -r '.access_token')
+
+echo "Token: $TOKEN"
+```
+
+### 3. Test Check Packing Key Exists
+
+Check if the user has set a packing key:
+
+```bash
+curl -X GET "${BASE_URL}/api/user/packing-key/exists" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Accept: application/json"
+```
+
+**Expected Response** (not set):
+```json
+{
+  "exists": false,
+  "message": "Packing key has not been set."
+}
+```
+
+### 4. Test Set/Update Packing Key
+
+Set the user's packing key for the first time:
+
+```bash
+curl -X POST "${BASE_URL}/api/user/packing-key" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "packing_key": "MySecretKey123!",
+    "packing_key_confirm": "MySecretKey123!"
+  }'
+```
+
+**Expected Response**:
+```json
+{
+  "message": "Packing key updated successfully."
+}
+```
+
+### 5. Test Validate Packing Key
+
+Validate the user's packing key (correct key):
+
+```bash
+curl -X POST "${BASE_URL}/api/user/validate-packing-key" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "packing_key": "MySecretKey123!"
+  }'
+```
+
+**Expected Response** (correct):
+```json
+{
+  "valid": true,
+  "message": "Packing key is correct."
+}
+```
+
+**Test with wrong key**:
+```bash
+curl -X POST "${BASE_URL}/api/user/validate-packing-key" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "packing_key": "WrongKey456!"
+  }'
+```
+
+**Expected Response** (incorrect):
+```json
+{
+  "valid": false,
+  "message": "Packing key is incorrect."
+}
+```
+
+### Complete Test Flow Script
+
+Here's a complete bash script to test the entire flow:
+
+```bash
+#!/bin/bash
+
+BASE_URL="https://localhost"
+
+# 1. Register user
+echo "=== 1. Registering user ==="
+curl -X POST "${BASE_URL}/api/register" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "testuser@example.com",
+    "password": "SecurePass123!",
+    "username": "testuser"
+  }'
+echo -e "\n"
+
+# 2. Get OAuth token (adjust OAuth endpoint and credentials)
+echo "=== 2. Getting OAuth token ==="
+TOKEN="YOUR_ACCESS_TOKEN_HERE"
+echo "Token: $TOKEN"
+echo -e "\n"
+
+# 3. Check if packing key exists
+echo "=== 3. Checking if packing key exists ==="
+curl -X GET "${BASE_URL}/api/user/packing-key/exists" \
+  -H "Authorization: Bearer $TOKEN"
+echo -e "\n"
+
+# 4. Set packing key
+echo "=== 4. Setting packing key ==="
+curl -X POST "${BASE_URL}/api/user/packing-key" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "packing_key": "MySecretKey123!",
+    "packing_key_confirm": "MySecretKey123!"
+  }'
+echo -e "\n"
+
+# 5. Validate packing key (correct)
+echo "=== 5. Validating packing key (correct) ==="
+curl -X POST "${BASE_URL}/api/user/validate-packing-key" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "packing_key": "MySecretKey123!"
+  }'
+echo -e "\n"
+
+# 6. Validate packing key (incorrect)
+echo "=== 6. Validating packing key (incorrect) ==="
+curl -X POST "${BASE_URL}/api/user/validate-packing-key" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "packing_key": "WrongKey!"
+  }'
+echo -e "\n"
+
+echo "=== Testing complete! ==="
+```
 
 ## Installation
 
@@ -139,12 +351,19 @@ The module creates a custom field on the user entity:
 - **Label**: Packing Key
 - **Type**: String (255 characters)
 - **Required**: No
-- **Description**: Hashed encryption/decryption key for secure password storage
+- **Description**: Hashed master key used by the frontend to encrypt/decrypt confidential password data
+
+**Security Model**:
+- The packing key itself is **never stored in plain text**
+- Only a **one-way hash** (Bcrypt/Argon2) is stored in Drupal
+- The hash is used to **validate** the user's key, not to decrypt data
+- The actual encryption/decryption happens **client-side** in the React frontend
+- This ensures that even with database access, passwords cannot be decrypted without the user's packing key
 
 The field is automatically:
 - Hidden from registration forms
-- Stored as a hashed value (using Drupal's password hasher)
-- Available on user edit form (see below)
+- Stored as a hashed value (using Drupal's password hasher - same as user passwords)
+- Available on user edit form with password-style protection (see below)
 
 ## Backend User Edit Form Integration
 
