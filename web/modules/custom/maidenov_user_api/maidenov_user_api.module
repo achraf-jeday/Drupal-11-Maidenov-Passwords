@@ -1,0 +1,197 @@
+<?php
+
+/**
+ * @file
+ * Custom module for Maidenov User API functionality.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\user\Entity\User;
+
+/**
+ * Implements hook_form_FORM_ID_alter() for user_form.
+ */
+function maidenov_user_api_form_user_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Only add to user edit form, not registration.
+  $user = $form_state->getFormObject()->getEntity();
+  if ($user->isNew()) {
+    return;
+  }
+
+  // Get current user and check if they're uid=1 editing another user.
+  $current_user = \Drupal::currentUser();
+  $is_admin_editing_other = ((int) $current_user->id() === 1) && ((int) $current_user->id() !== (int) $user->id());
+
+  // Get current packing key status.
+  $has_packing_key = !empty($user->get('field_packing_key')->value);
+
+  // Create a fieldset for packing key management.
+  $form['packing_key_section'] = [
+    '#type' => 'details',
+    '#title' => t('Packing Key Management'),
+    '#open' => FALSE,
+    '#weight' => 10,
+    '#tree' => FALSE,
+  ];
+
+  // Show different status messages based on context.
+  if ($is_admin_editing_other) {
+    if ($has_packing_key) {
+      $form['packing_key_section']['packing_key_status'] = [
+        '#type' => 'item',
+        '#markup' => '<div class="messages messages--status">' . t("This user's packing key is currently set.") . '</div>',
+      ];
+    }
+    else {
+      $form['packing_key_section']['packing_key_status'] = [
+        '#type' => 'item',
+        '#markup' => '<div class="messages messages--warning">' . t('This user has not set a packing key yet.') . '</div>',
+      ];
+    }
+  }
+  else {
+    if ($has_packing_key) {
+      $form['packing_key_section']['packing_key_status'] = [
+        '#type' => 'item',
+        '#markup' => '<div class="messages messages--status">' . t('Your packing key is currently set.') . '</div>',
+      ];
+    }
+    else {
+      $form['packing_key_section']['packing_key_status'] = [
+        '#type' => 'item',
+        '#markup' => '<div class="messages messages--warning">' . t('You have not set a packing key yet.') . '</div>',
+      ];
+    }
+  }
+
+  $form['packing_key_section']['new_packing_key'] = [
+    '#type' => 'password',
+    '#title' => $has_packing_key ? t('New packing key') : t('Packing key'),
+    '#description' => $is_admin_editing_other
+      ? t("Enter the user's packing key for encrypting/decrypting their password data. Leave blank if you do not want to change it.")
+      : t('Enter your packing key for encrypting/decrypting your password data. Leave blank if you do not want to change it.'),
+    '#size' => 25,
+  ];
+
+  $form['packing_key_section']['new_packing_key_confirm'] = [
+    '#type' => 'password',
+    '#title' => t('Confirm packing key'),
+    '#description' => t('Re-enter the packing key to confirm.'),
+    '#size' => 25,
+  ];
+
+  // Only show current password field if NOT admin editing another user.
+  if (!$is_admin_editing_other) {
+    $form['packing_key_section']['current_pass_for_packing_key'] = [
+      '#type' => 'password',
+      '#title' => t('Current password'),
+      '#description' => t('Enter your current password to change your packing key.'),
+      '#size' => 25,
+      '#attributes' => ['autocomplete' => 'off'],
+    ];
+  }
+
+  // Store admin status for use in validation.
+  $form['packing_key_section']['is_admin_editing_other'] = [
+    '#type' => 'value',
+    '#value' => $is_admin_editing_other,
+  ];
+
+  // Add custom validation.
+  $form['#validate'][] = 'maidenov_user_api_user_form_validate';
+
+  // Add custom submit handler.
+  $form['actions']['submit']['#submit'][] = 'maidenov_user_api_user_form_submit';
+}
+
+/**
+ * Custom validation handler for user edit form.
+ */
+function maidenov_user_api_user_form_validate(&$form, FormStateInterface $form_state) {
+  $new_packing_key = $form_state->getValue('new_packing_key');
+  $new_packing_key_confirm = $form_state->getValue('new_packing_key_confirm');
+  $current_password = $form_state->getValue('current_pass_for_packing_key');
+  $is_admin_editing_other = $form_state->getValue('is_admin_editing_other');
+
+  // Only validate if user is trying to set/change packing key.
+  if (!empty($new_packing_key) || !empty($new_packing_key_confirm) || (!$is_admin_editing_other && !empty($current_password))) {
+
+    // Ensure packing key is provided.
+    if (empty($new_packing_key)) {
+      $form_state->setErrorByName('new_packing_key', t('Packing key is required.'));
+    }
+
+    // Ensure confirmation is provided.
+    if (empty($new_packing_key_confirm)) {
+      $form_state->setErrorByName('new_packing_key_confirm', t('Packing key confirmation is required.'));
+    }
+
+    // Check if packing keys match.
+    if (!empty($new_packing_key) && !empty($new_packing_key_confirm)) {
+      if ($new_packing_key !== $new_packing_key_confirm) {
+        $form_state->setErrorByName('new_packing_key_confirm', t('The packing keys do not match.'));
+      }
+    }
+
+    // Only require and validate current password if NOT admin editing another user.
+    if (!$is_admin_editing_other) {
+      // Ensure current password is provided.
+      if (empty($current_password)) {
+        $form_state->setErrorByName('current_pass_for_packing_key', t('Your current password is required to change your packing key.'));
+      }
+
+      // Verify current password if provided.
+      if (!empty($current_password)) {
+        $user = $form_state->getFormObject()->getEntity();
+        $password_hasher = \Drupal::service('password');
+
+        if (!$password_hasher->check($current_password, $user->getPassword())) {
+          $form_state->setErrorByName('current_pass_for_packing_key', t('The current password you provided is incorrect.'));
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Custom submit handler for user edit form.
+ */
+function maidenov_user_api_user_form_submit(&$form, FormStateInterface $form_state) {
+  $new_packing_key = $form_state->getValue('new_packing_key');
+  $is_admin_editing_other = $form_state->getValue('is_admin_editing_other');
+
+  // Only update if a new packing key was provided.
+  if (!empty($new_packing_key)) {
+    $user = $form_state->getFormObject()->getEntity();
+    $password_hasher = \Drupal::service('password');
+    $current_user = \Drupal::currentUser();
+
+    // Hash the packing key.
+    $hashed_packing_key = $password_hasher->hash($new_packing_key);
+
+    // Update the field.
+    $user->set('field_packing_key', $hashed_packing_key);
+    $user->save();
+
+    // Log the change with context.
+    if ($is_admin_editing_other) {
+      \Drupal::logger('maidenov_user_api')->notice('Administrator @admin updated packing key for user @user.', [
+        '@admin' => $current_user->getAccountName(),
+        '@user' => $user->getAccountName(),
+      ]);
+
+      // Show success message for admin.
+      \Drupal::messenger()->addMessage(t('Packing key for @username has been updated successfully.', [
+        '@username' => $user->getAccountName(),
+      ]));
+    }
+    else {
+      \Drupal::logger('maidenov_user_api')->notice('User @name updated their packing key via user edit form.', [
+        '@name' => $user->getAccountName(),
+      ]);
+
+      // Show success message for self.
+      \Drupal::messenger()->addMessage(t('Your packing key has been updated successfully.'));
+    }
+  }
+}

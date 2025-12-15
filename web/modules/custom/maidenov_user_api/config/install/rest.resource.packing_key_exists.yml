@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - maidenov_user_api
+    - serialization
+    - user
+id: packing_key_exists
+plugin_id: packing_key_exists
+granularity: resource
+configuration:
+  methods:
+    - GET
+  formats:
+    - json
+  authentication:
+    - cookie
+    - oauth2

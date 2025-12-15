@@ -1,0 +1,109 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Maidenov User API module.
+ */
+
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\Core\Entity\EntityStorageException;
+
+/**
+ * Implements hook_install().
+ */
+function maidenov_user_api_install() {
+  // Create the packing key field storage.
+  if (!FieldStorageConfig::loadByName('user', 'field_packing_key')) {
+    FieldStorageConfig::create([
+      'field_name' => 'field_packing_key',
+      'entity_type' => 'user',
+      'type' => 'string',
+      'settings' => [
+        'max_length' => 255,
+        'is_ascii' => FALSE,
+        'case_sensitive' => TRUE,
+      ],
+      'cardinality' => 1,
+    ])->save();
+  }
+
+  // Create the packing key field instance.
+  if (!FieldConfig::loadByName('user', 'user', 'field_packing_key')) {
+    FieldConfig::create([
+      'field_name' => 'field_packing_key',
+      'entity_type' => 'user',
+      'bundle' => 'user',
+      'label' => 'Packing Key',
+      'description' => 'Hashed encryption/decryption key for secure password storage.',
+      'required' => FALSE,
+      'settings' => [],
+      'default_value' => [],
+    ])->save();
+
+    // Configure the field for form displays.
+    _maidenov_user_api_configure_form_display();
+  }
+
+  \Drupal::messenger()->addMessage(t('Maidenov User API module installed. The Packing Key field has been added to user accounts.'));
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function maidenov_user_api_uninstall() {
+  // Delete the field configuration.
+  $field_config = FieldConfig::loadByName('user', 'user', 'field_packing_key');
+  if ($field_config) {
+    try {
+      $field_config->delete();
+    }
+    catch (EntityStorageException $e) {
+      \Drupal::logger('maidenov_user_api')->error('Failed to delete field configuration: @message', [
+        '@message' => $e->getMessage(),
+      ]);
+    }
+  }
+
+  // Delete the field storage.
+  $field_storage = FieldStorageConfig::loadByName('user', 'field_packing_key');
+  if ($field_storage) {
+    try {
+      $field_storage->delete();
+    }
+    catch (EntityStorageException $e) {
+      \Drupal::logger('maidenov_user_api')->error('Failed to delete field storage: @message', [
+        '@message' => $e->getMessage(),
+      ]);
+    }
+  }
+
+  \Drupal::messenger()->addMessage(t('Maidenov User API module uninstalled. The Packing Key field has been removed.'));
+}
+
+/**
+ * Helper function to configure form display for the packing key field.
+ */
+function _maidenov_user_api_configure_form_display() {
+  // Load the default form display for user.
+  $form_display = \Drupal::entityTypeManager()
+    ->getStorage('entity_form_display')
+    ->load('user.user.default');
+
+  if ($form_display) {
+    // Hide the field from the default form display (it will be managed via API).
+    $form_display->removeComponent('field_packing_key');
+    $form_display->save();
+  }
+
+  // Load the registration form display.
+  $register_display = \Drupal::entityTypeManager()
+    ->getStorage('entity_form_display')
+    ->load('user.user.register');
+
+  if ($register_display) {
+    // Hide the field from registration form.
+    $register_display->removeComponent('field_packing_key');
+    $register_display->save();
+  }
+}
