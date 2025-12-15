@@ -154,29 +154,33 @@ The module adds a **"Packing Key Management"** section to the Drupal user edit f
 - Shows current packing key status (set or not set)
 - Password-style input fields (hidden characters)
 - Confirmation field to prevent typos
-- **Requires current account password** to change the packing key (for regular users)
-- Similar UX to changing email/password in Drupal
+- **Uses Drupal's existing "Current password" field** for verification (same field used for email/password changes)
+- Integrates seamlessly with standard Drupal user form behavior
 
-**Form Fields**:
-1. **Packing key status** - Visual indicator if key is set
-2. **New packing key** - Password field for entering key
+**Form Fields in "Packing Key Management" Section**:
+1. **Packing key status** - Visual indicator showing if key is set or not
+2. **New packing key** - Password field for entering the packing key
 3. **Confirm packing key** - Password field for confirmation
-4. **Current password** - Required for security verification (see below)
+
+**Existing Drupal Field (Updated)**:
+- **Current password** (at top of form) - Description updated to include: "Required if you want to change the Email address, Password, or Packing Key below"
+- This field is shared with email/password changes, maintaining consistency with Drupal's standard pattern
 
 ### Administrator Privileges (uid=1)
 
 The **super administrator** (user ID 1) has special privileges when managing other users' packing keys:
 
 **When uid=1 edits their own account** (`/user/1/edit`):
-- ✅ Current password **is required** (normal security flow)
+- ✅ Current password **is required** (uses the existing "Current password" field at the top)
 - ✅ Must confirm packing key
 - Standard user experience
 
 **When uid=1 edits another user's account** (e.g., `/user/2/edit`):
-- ❌ Current password **not required** (password field is hidden)
+- ❌ Current password **not required** (validation skips password check for admin)
 - ✅ Must still confirm packing key
 - Status messages show "This user's packing key..." instead of "Your packing key..."
 - Success message shows "Packing key for @username has been updated"
+- The existing "Current password" field remains visible but is not validated for packing key changes
 
 **Purpose**: This allows the super administrator to set/reset packing keys for testing purposes without needing to know users' passwords (similar to how uid=1 can change any user's password).
 

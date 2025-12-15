@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 use Drupal\user\Entity\User;
 
 /**
@@ -80,15 +81,12 @@ function maidenov_user_api_form_user_form_alter(&$form, FormStateInterface $form
     '#size' => 25,
   ];
 
-  // Only show current password field if NOT admin editing another user.
-  if (!$is_admin_editing_other) {
-    $form['packing_key_section']['current_pass_for_packing_key'] = [
-      '#type' => 'password',
-      '#title' => t('Current password'),
-      '#description' => t('Enter your current password to change your packing key.'),
-      '#size' => 25,
-      '#attributes' => ['autocomplete' => 'off'],
-    ];
+  // Update the existing "current_pass" field description to include packing key.
+  // Only do this if NOT admin editing another user.
+  if (!$is_admin_editing_other && isset($form['account']['current_pass'])) {
+    $form['account']['current_pass']['#description'] = t('Required if you want to change the <em>Email address</em>, <em>Password</em>, or <em>Packing Key</em> below. <a href=":url">Reset your password</a>.', [
+      ':url' => Url::fromRoute('user.pass')->toString(),
+    ]);
   }
 
   // Store admin status for use in validation.
@@ -110,11 +108,10 @@ function maidenov_user_api_form_user_form_alter(&$form, FormStateInterface $form
 function maidenov_user_api_user_form_validate(&$form, FormStateInterface $form_state) {
   $new_packing_key = $form_state->getValue('new_packing_key');
   $new_packing_key_confirm = $form_state->getValue('new_packing_key_confirm');
-  $current_password = $form_state->getValue('current_pass_for_packing_key');
   $is_admin_editing_other = $form_state->getValue('is_admin_editing_other');
 
   // Only validate if user is trying to set/change packing key.
-  if (!empty($new_packing_key) || !empty($new_packing_key_confirm) || (!$is_admin_editing_other && !empty($current_password))) {
+  if (!empty($new_packing_key) || !empty($new_packing_key_confirm)) {
 
     // Ensure packing key is provided.
     if (empty($new_packing_key)) {
@@ -135,18 +132,20 @@ function maidenov_user_api_user_form_validate(&$form, FormStateInterface $form_s
 
     // Only require and validate current password if NOT admin editing another user.
     if (!$is_admin_editing_other) {
-      // Ensure current password is provided.
-      if (empty($current_password)) {
-        $form_state->setErrorByName('current_pass_for_packing_key', t('Your current password is required to change your packing key.'));
-      }
+      // Get the current password from the existing Drupal field.
+      $current_password = $form_state->getValue('current_pass');
 
-      // Verify current password if provided.
-      if (!empty($current_password)) {
+      // Ensure current password is provided when changing packing key.
+      if (empty($current_password)) {
+        $form_state->setErrorByName('current_pass', t('Your current password is required to change your packing key.'));
+      }
+      else {
+        // Verify current password.
         $user = $form_state->getFormObject()->getEntity();
         $password_hasher = \Drupal::service('password');
 
         if (!$password_hasher->check($current_password, $user->getPassword())) {
-          $form_state->setErrorByName('current_pass_for_packing_key', t('The current password you provided is incorrect.'));
+          $form_state->setErrorByName('current_pass', t('The current password you provided is incorrect.'));
         }
       }
     }
