@@ -1,0 +1,22 @@
+uuid: 515faaad-52f9-43fb-84dd-759b5467db0d
+langcode: en
+status: true
+dependencies:
+  module:
+    - maidenov_user_api
+    - serialization
+    - simple_oauth
+    - user
+_core:
+  default_config_hash: cAgSQxhJmvurSjGv1ldkzlSONYvp58jY39rjZyexBjA
+id: packing_key_exists
+plugin_id: packing_key_exists
+granularity: resource
+configuration:
+  methods:
+    - GET
+  formats:
+    - json
+  authentication:
+    - cookie
+    - oauth2

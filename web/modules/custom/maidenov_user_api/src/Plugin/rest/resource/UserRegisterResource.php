@@ -85,6 +85,9 @@ class UserRegisterResource extends ResourceBase {
         'init' => $data['email'],
       ]);
 
+      // Assign the 'confidential_data_user' role.
+      $user->addRole('confidential_data_user');
+
       // Validate the user entity.
       $violations = $user->validate();
       if ($violations->count() > 0) {

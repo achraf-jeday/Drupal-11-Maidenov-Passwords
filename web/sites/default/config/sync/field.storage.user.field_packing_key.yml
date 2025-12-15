@@ -1,0 +1,21 @@
+uuid: 78463637-1b66-4811-940f-a472fdcfd2a6
+langcode: en
+status: true
+dependencies:
+  module:
+    - user
+id: user.field_packing_key
+field_name: field_packing_key
+entity_type: user
+type: string
+settings:
+  max_length: 255
+  case_sensitive: true
+  is_ascii: false
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

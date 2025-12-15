@@ -1,0 +1,19 @@
+uuid: f41df605-8aca-4c84-bce6-6e1c20612d26
+langcode: en
+status: true
+dependencies:
+  module:
+    - serialization
+    - user
+id: entity.user
+plugin_id: 'entity:user'
+granularity: resource
+configuration:
+  methods:
+    - GET
+  formats:
+    - json
+  authentication:
+    - jwt_auth
+    - oauth2
+    - cookie

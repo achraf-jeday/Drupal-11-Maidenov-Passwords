@@ -2,14 +2,24 @@ uuid: 2ac62b00-2b85-4067-9d18-f77c1bafa5cf
 langcode: en
 status: true
 dependencies:
+  config:
+    - rest.resource.packing_key_exists
+    - rest.resource.packing_key_update
+    - rest.resource.packing_key_validate
   module:
+    - rest
     - user_confidential_data
 id: confidential_data_user
 label: 'Confidential data user'
 weight: 4
 is_admin: false
 permissions:
+  - 'access user profiles'
+  - 'administer users'
   - 'create user confidential data'
   - 'delete own user confidential data'
   - 'edit own user confidential data'
+  - 'restful get packing_key_exists'
+  - 'restful post packing_key_update'
+  - 'restful post packing_key_validate'
   - 'view own user confidential data'

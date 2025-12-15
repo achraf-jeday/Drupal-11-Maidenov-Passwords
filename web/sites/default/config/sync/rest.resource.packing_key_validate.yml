@@ -1,0 +1,22 @@
+uuid: db9d780b-db39-478b-93ee-1828025b2a6e
+langcode: en
+status: true
+dependencies:
+  module:
+    - maidenov_user_api
+    - serialization
+    - simple_oauth
+    - user
+_core:
+  default_config_hash: dbehXZthBxCVfS-g6GlQmzTqUun_yVt3gPOnz38YAM0
+id: packing_key_validate
+plugin_id: packing_key_validate
+granularity: resource
+configuration:
+  methods:
+    - POST
+  formats:
+    - json
+  authentication:
+    - cookie
+    - oauth2

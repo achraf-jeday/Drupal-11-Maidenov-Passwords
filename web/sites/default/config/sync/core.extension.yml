@@ -28,6 +28,7 @@ module:
   jsonapi: 0
   jsonapi_extras: 0
   link: 0
+  maidenov_user_api: 0
   menu_link_content: 0
   menu_ui: 0
   node: 0
@@ -36,6 +37,7 @@ module:
   path: 0
   path_alias: 0
   pgsql: 0
+  rest: 0
   search: 0
   serialization: 0
   shortcut: 0

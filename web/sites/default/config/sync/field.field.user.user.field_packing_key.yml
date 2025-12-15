@@ -1,0 +1,20 @@
+uuid: 2f9916e0-84df-488e-b2c3-d0d5fa5e889d
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_packing_key
+  module:
+    - user
+id: user.user.field_packing_key
+field_name: field_packing_key
+entity_type: user
+bundle: user
+label: 'Packing Key'
+description: 'Hashed encryption/decryption key for secure password storage.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

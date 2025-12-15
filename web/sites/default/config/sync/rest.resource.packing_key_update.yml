@@ -1,0 +1,22 @@
+uuid: 02549bbb-c57f-40b6-b875-fd5cb9b85364
+langcode: en
+status: true
+dependencies:
+  module:
+    - maidenov_user_api
+    - serialization
+    - simple_oauth
+    - user
+_core:
+  default_config_hash: 1keoqUjw-CQhqmok3XRsaWk9aPEppks6qWhFEpSEh68
+id: packing_key_update
+plugin_id: packing_key_update
+granularity: resource
+configuration:
+  methods:
+    - POST
+  formats:
+    - json
+  authentication:
+    - cookie
+    - oauth2
