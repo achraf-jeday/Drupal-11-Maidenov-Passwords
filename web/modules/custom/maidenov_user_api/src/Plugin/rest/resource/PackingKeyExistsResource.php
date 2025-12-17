@@ -89,12 +89,22 @@ class PackingKeyExistsResource extends ResourceBase {
       // Check if packing key is set (not null and not empty).
       $exists = !empty($stored_hash);
 
-      return new ResourceResponse([
+      $response = new ResourceResponse([
         'exists' => $exists,
         'message' => $exists
           ? 'Packing key has been set.'
           : 'Packing key has not been set.',
       ], 200);
+
+      // Completely disable caching for this response
+      $cache_metadata = $response->getCacheableMetadata();
+      $cache_metadata->setCacheMaxAge(0);
+      $cache_metadata->addCacheContexts(['url.query_args']);
+
+      // This is the kill switch for Dynamic Page Cache
+      \Drupal::service('page_cache_kill_switch')->trigger();
+
+      return $response;
 
     }
     catch (AccessDeniedHttpException $e) {
