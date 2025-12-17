@@ -205,3 +205,25 @@ function user_confidential_data_user_login_validate(array &$form, FormStateInter
     }
   }
 }
+
+/**
+ * Implements hook_page_attachments().
+ *
+ * Adds 'user' cache context for JSON:API user_confidential_data endpoints.
+ * This ensures Dynamic Page Cache creates separate cache entries per user.
+ *
+ * WHY THIS IS NEEDED:
+ * - The query alter hook filters results by user, but doesn't add cache metadata
+ * - Without this, Dynamic Page Cache serves the same cached response to all users
+ * - This hook tells Drupal: "cache varies by which user is logged in"
+ */
+function user_confidential_data_page_attachments(array &$attachments) {
+  $route_match = \Drupal::routeMatch();
+  $route_name = $route_match->getRouteName();
+
+  // Check if this is a JSON:API route for user_confidential_data.
+  if ($route_name && str_starts_with($route_name, 'jsonapi.user_confidential_data')) {
+    // Add user cache context to ensure cache varies per user.
+    $attachments['#cache']['contexts'][] = 'user';
+  }
+}

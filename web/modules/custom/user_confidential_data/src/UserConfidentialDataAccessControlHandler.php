@@ -30,6 +30,7 @@ class UserConfidentialDataAccessControlHandler extends EntityAccessControlHandle
           $is_owner = $entity->get('user_id')->target_id == $account->id();
           return AccessResult::allowedIf($is_owner)
             ->cachePerPermissions()
+            ->cachePerUser()
             ->addCacheableDependency($entity);
         }
 
@@ -41,6 +42,7 @@ class UserConfidentialDataAccessControlHandler extends EntityAccessControlHandle
           $is_owner = $entity->get('user_id')->target_id == $account->id();
           return AccessResult::allowedIf($is_owner)
             ->cachePerPermissions()
+            ->cachePerUser()
             ->addCacheableDependency($entity);
         }
 
@@ -52,6 +54,7 @@ class UserConfidentialDataAccessControlHandler extends EntityAccessControlHandle
           $is_owner = $entity->get('user_id')->target_id == $account->id();
           return AccessResult::allowedIf($is_owner)
             ->cachePerPermissions()
+            ->cachePerUser()
             ->addCacheableDependency($entity);
         }
 

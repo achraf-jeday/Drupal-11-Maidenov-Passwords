@@ -8,3 +8,7 @@ services:
     class: Drupal\user_confidential_data\Encryption\EntityEncryptionHelper
     arguments: ['@user_confidential_data.field_encryption']
     public: true
+  user_confidential_data.cache_subscriber:
+    class: Drupal\user_confidential_data\EventSubscriber\UserConfidentialDataCacheSubscriber
+    tags:
+      - { name: event_subscriber }
