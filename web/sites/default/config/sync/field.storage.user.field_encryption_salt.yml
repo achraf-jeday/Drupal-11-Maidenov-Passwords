@@ -1,17 +1,17 @@
-uuid: 5ea07952-34c3-473f-bf54-400a9e172f01
+uuid: c92eb84f-5858-465e-a7d8-dd2a9cedc1c3
 langcode: en
 status: true
 dependencies:
   module:
     - user
-id: user.field_packing_key
-field_name: field_packing_key
+id: user.field_encryption_salt
+field_name: field_encryption_salt
 entity_type: user
 type: string
 settings:
   max_length: 255
   case_sensitive: true
-  is_ascii: false
+  is_ascii: true
 module: core
 locked: false
 cardinality: 1

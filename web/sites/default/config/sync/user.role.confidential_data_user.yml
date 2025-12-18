@@ -19,6 +19,7 @@ permissions:
   - 'create user confidential data'
   - 'delete own user confidential data'
   - 'edit own user confidential data'
+  - 'restful get current_user_uuid'
   - 'restful get packing_key_exists'
   - 'restful post packing_key_update'
   - 'restful post packing_key_validate'

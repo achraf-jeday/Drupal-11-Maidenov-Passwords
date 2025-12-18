@@ -4,11 +4,13 @@ status: true
 dependencies:
   config:
     - filter.format.basic_html
+    - rest.resource.current_user_uuid
   module:
     - comment
     - contact
     - file
     - filter
+    - rest
     - search
     - shortcut
     - system
@@ -25,6 +27,7 @@ permissions:
   - 'access site-wide contact form'
   - 'delete own files'
   - 'post comments'
+  - 'restful get current_user_uuid'
   - 'search content'
   - 'skip comment approval'
   - 'use text format basic_html'

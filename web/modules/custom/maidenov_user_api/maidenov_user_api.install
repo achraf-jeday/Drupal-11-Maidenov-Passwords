@@ -45,14 +45,46 @@ function maidenov_user_api_install() {
     _maidenov_user_api_configure_form_display();
   }
 
-  \Drupal::messenger()->addMessage(t('Maidenov User API module installed. The Packing Key field has been added to user accounts.'));
+  // Create the salt field storage.
+  if (!FieldStorageConfig::loadByName('user', 'field_encryption_salt')) {
+    FieldStorageConfig::create([
+      'field_name' => 'field_encryption_salt',
+      'entity_type' => 'user',
+      'type' => 'string',
+      'settings' => [
+        'max_length' => 255,
+        'is_ascii' => TRUE,
+        'case_sensitive' => TRUE,
+      ],
+      'cardinality' => 1,
+    ])->save();
+  }
+
+  // Create the salt field instance.
+  if (!FieldConfig::loadByName('user', 'user', 'field_encryption_salt')) {
+    FieldConfig::create([
+      'field_name' => 'field_encryption_salt',
+      'entity_type' => 'user',
+      'bundle' => 'user',
+      'label' => 'Encryption Salt',
+      'description' => 'Salt for PBKDF2 key derivation (base64 encoded, 16 bytes).',
+      'required' => FALSE,
+      'settings' => [],
+      'default_value' => [],
+    ])->save();
+
+    // Configure the field for form displays.
+    _maidenov_user_api_configure_form_display();
+  }
+
+  \Drupal::messenger()->addMessage(t('Maidenov User API module installed. The Packing Key and Encryption Salt fields have been added to user accounts.'));
 }
 
 /**
  * Implements hook_uninstall().
  */
 function maidenov_user_api_uninstall() {
-  // Delete the field configuration.
+  // Delete the packing key field configuration.
   $field_config = FieldConfig::loadByName('user', 'user', 'field_packing_key');
   if ($field_config) {
     try {
@@ -65,7 +97,7 @@ function maidenov_user_api_uninstall() {
     }
   }
 
-  // Delete the field storage.
+  // Delete the packing key field storage.
   $field_storage = FieldStorageConfig::loadByName('user', 'field_packing_key');
   if ($field_storage) {
     try {
@@ -78,11 +110,37 @@ function maidenov_user_api_uninstall() {
     }
   }
 
-  \Drupal::messenger()->addMessage(t('Maidenov User API module uninstalled. The Packing Key field has been removed.'));
+  // Delete the salt field configuration.
+  $salt_field_config = FieldConfig::loadByName('user', 'user', 'field_encryption_salt');
+  if ($salt_field_config) {
+    try {
+      $salt_field_config->delete();
+    }
+    catch (EntityStorageException $e) {
+      \Drupal::logger('maidenov_user_api')->error('Failed to delete salt field configuration: @message', [
+        '@message' => $e->getMessage(),
+      ]);
+    }
+  }
+
+  // Delete the salt field storage.
+  $salt_field_storage = FieldStorageConfig::loadByName('user', 'field_encryption_salt');
+  if ($salt_field_storage) {
+    try {
+      $salt_field_storage->delete();
+    }
+    catch (EntityStorageException $e) {
+      \Drupal::logger('maidenov_user_api')->error('Failed to delete salt field storage: @message', [
+        '@message' => $e->getMessage(),
+      ]);
+    }
+  }
+
+  \Drupal::messenger()->addMessage(t('Maidenov User API module uninstalled. The Packing Key and Encryption Salt fields have been removed.'));
 }
 
 /**
- * Helper function to configure form display for the packing key field.
+ * Helper function to configure form display for the packing key and salt fields.
  */
 function _maidenov_user_api_configure_form_display() {
   // Load the default form display for user.
@@ -91,8 +149,9 @@ function _maidenov_user_api_configure_form_display() {
     ->load('user.user.default');
 
   if ($form_display) {
-    // Hide the field from the default form display (it will be managed via API).
+    // Hide the fields from the default form display (they will be managed via API).
     $form_display->removeComponent('field_packing_key');
+    $form_display->removeComponent('field_encryption_salt');
     $form_display->save();
   }
 
@@ -102,8 +161,9 @@ function _maidenov_user_api_configure_form_display() {
     ->load('user.user.register');
 
   if ($register_display) {
-    // Hide the field from registration form.
+    // Hide the fields from registration form.
     $register_display->removeComponent('field_packing_key');
+    $register_display->removeComponent('field_encryption_salt');
     $register_display->save();
   }
 }

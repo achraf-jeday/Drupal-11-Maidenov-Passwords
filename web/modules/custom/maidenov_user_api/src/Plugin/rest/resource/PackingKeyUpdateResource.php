@@ -75,12 +75,13 @@ class PackingKeyUpdateResource extends ResourceBase {
   /**
    * Responds to POST requests.
    *
-   * Updates the user's packing key.
+   * Updates the user's packing key and encryption salt.
    *
    * @param array $data
    *   The request data containing:
    *   - packing_key: The new packing key to hash and store
    *   - packing_key_confirm: Confirmation of the packing key
+   *   - salt: Base64 encoded salt for PBKDF2 key derivation
    *
    * @return \Drupal\rest\ModifiedResourceResponse
    *   The HTTP response object.
@@ -104,6 +105,10 @@ class PackingKeyUpdateResource extends ResourceBase {
       throw new BadRequestHttpException('Packing key confirmation is required.');
     }
 
+    if (empty($data['salt'])) {
+      throw new BadRequestHttpException('Encryption salt is required.');
+    }
+
     // Verify packing keys match.
     if ($data['packing_key'] !== $data['packing_key_confirm']) {
       throw new UnprocessableEntityHttpException('Packing keys do not match.');
@@ -120,8 +125,9 @@ class PackingKeyUpdateResource extends ResourceBase {
       // Hash the packing key (using Drupal's password hasher for consistency).
       $hashed_packing_key = $this->passwordHasher->hash($data['packing_key']);
 
-      // Update the packing key field.
+      // Update the packing key field and salt.
       $user->set('field_packing_key', $hashed_packing_key);
+      $user->set('field_encryption_salt', $data['salt']);
 
       // Validate the user entity.
       $violations = $user->validate();

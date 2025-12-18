@@ -1,0 +1,20 @@
+uuid: 32f53993-706d-4e30-9834-ba3f0ec4dd59
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_encryption_salt
+  module:
+    - user
+id: user.user.field_encryption_salt
+field_name: field_encryption_salt
+entity_type: user
+bundle: user
+label: 'Encryption Salt'
+description: 'Salt for PBKDF2 key derivation (base64 encoded, 16 bytes).'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

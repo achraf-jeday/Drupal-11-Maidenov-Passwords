@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - core.entity_view_mode.user.compact
+    - field.field.user.user.field_encryption_salt
     - field.field.user.user.field_packing_key
     - field.field.user.user.user_picture
     - image.style.thumbnail
@@ -29,5 +30,6 @@ content:
     weight: 0
     region: content
 hidden:
+  field_encryption_salt: true
   field_packing_key: true
   member_for: true

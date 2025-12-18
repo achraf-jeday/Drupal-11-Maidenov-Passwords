@@ -1,0 +1,10 @@
+resources:
+  user_confidential_data--user_confidential_data:
+    read: true
+    create: true
+    update: true
+    delete: true
+    sort: true
+    filter: true
+    include: true
+    create-unfiltered-html: true

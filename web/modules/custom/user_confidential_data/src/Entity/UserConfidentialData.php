@@ -194,7 +194,7 @@ class UserConfidentialData extends ContentEntityBase implements UserConfidential
       ->setDescription(t('The name of the User Confidential Data.'))
       ->setRevisionable(TRUE)
       ->setSettings([
-        'max_length' => 255,
+        'max_length' => 1024,
         'text_processing' => 0,
       ])
       ->setDefaultValue('')
@@ -211,18 +211,23 @@ class UserConfidentialData extends ContentEntityBase implements UserConfidential
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['email'] = BaseFieldDefinition::create('email')
+    $fields['email'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Email'))
       ->setDescription(t('The email address associated with this confidential data.'))
       ->setRevisionable(TRUE)
+      ->setSettings([
+        'max_length' => 1024,
+        'text_processing' => 0,
+      ])
+      ->setDefaultValue('')
       ->setRequired(FALSE)
       ->setDisplayOptions('view', [
         'label' => 'visible',
-        'type' => 'basic_string',
+        'type' => 'string',
         'weight' => -4,
       ])
       ->setDisplayOptions('form', [
-        'type' => 'email_default',
+        'type' => 'string_textfield',
         'weight' => -4,
       ])
       ->setDisplayConfigurable('form', TRUE)
@@ -289,7 +294,7 @@ class UserConfidentialData extends ContentEntityBase implements UserConfidential
       ->setDescription(t('The username for this confidential data.'))
       ->setRevisionable(TRUE)
       ->setSettings([
-        'max_length' => 255,
+        'max_length' => 1024,
         'text_processing' => 0,
       ])
       ->setDefaultValue('')
@@ -312,7 +317,7 @@ class UserConfidentialData extends ContentEntityBase implements UserConfidential
       ->setDescription(t('The password for this confidential data.'))
       ->setRevisionable(TRUE)
       ->setSettings([
-        'max_length' => 255,
+        'max_length' => 1024,
         'text_processing' => 0,
       ])
       ->setDefaultValue('')

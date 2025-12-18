@@ -119,6 +119,9 @@ class PackingKeyValidateResource extends ResourceBase {
       $is_valid = $this->passwordHasher->check($data['packing_key'], $stored_hash);
 
       if ($is_valid) {
+        // Get the encryption salt
+        $salt = $user->get('field_encryption_salt')->value;
+
         $this->logger->info('User @name successfully validated their packing key.', [
           '@name' => $user->getAccountName(),
         ]);
@@ -126,6 +129,7 @@ class PackingKeyValidateResource extends ResourceBase {
         return new ModifiedResourceResponse([
           'valid' => TRUE,
           'message' => 'Packing key is correct.',
+          'salt' => $salt,
         ], 200);
       }
       else {

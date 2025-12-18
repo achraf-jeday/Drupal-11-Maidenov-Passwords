@@ -1,4 +1,4 @@
-uuid: 3ee998ab-4563-473c-8020-25b5cb63bd9a
+uuid: 9718c4e2-f384-4e7f-9142-a1ff7bc2c32f
 langcode: en
 status: true
 dependencies:
@@ -6,8 +6,6 @@ dependencies:
     - maidenov_user_api
     - serialization
     - user
-_core:
-  default_config_hash: seggehaT0iZmVG9YiAWBE9KI0o7sx2YvjYIpQj60HrU
 id: user_register
 plugin_id: user_register
 granularity: resource

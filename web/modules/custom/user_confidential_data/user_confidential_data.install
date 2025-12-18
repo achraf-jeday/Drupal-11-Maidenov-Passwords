@@ -15,56 +15,6 @@ function user_confidential_data_install() {
 }
 
 /**
- * Implements hook_update_N().
- */
-function user_confidential_data_update_8001() {
-  $database = \Drupal::database();
-
-  // Check if we need to encrypt existing data
-  $existing_data = $database->select('user_confidential_data', 'ucd')
-    ->fields('ucd', ['id', 'name', 'email', 'username', 'password', 'notes'])
-    ->range(0, 1)
-    ->execute()
-    ->fetchAssoc();
-
-  if ($existing_data) {
-    // Check if data is already encrypted by looking at the name field
-    $is_encrypted = @base64_decode($existing_data['name'], true) !== false;
-
-    if (!$is_encrypted) {
-      // Data needs to be encrypted
-      $encryption_service = \Drupal::service('user_confidential_data.field_encryption');
-      $field_mapping = [
-        'name' => 'name',
-        'email' => 'email',
-        'username' => 'username',
-        'password' => 'password',
-        'notes' => 'notes',
-      ];
-
-      $query = $database->select('user_confidential_data', 'ucd')
-        ->fields('ucd', ['id', 'name', 'email', 'username', 'password', 'notes']);
-
-      $results = $query->execute();
-
-      foreach ($results as $row) {
-        foreach ($field_mapping as $db_field => $entity_field) {
-          if (!empty($row->$db_field)) {
-            $encrypted_value = $encryption_service->encryptField($row->$db_field);
-            if ($encrypted_value !== null) {
-              $database->update('user_confidential_data')
-                ->fields([$db_field => $encrypted_value])
-                ->condition('id', $row->id)
-                ->execute();
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-/**
  * Implements hook_uninstall().
  */
 function user_confidential_data_uninstall() {

@@ -1,4 +1,3 @@
-uuid: f7ce3ca9-9cb1-4617-8f90-3b6298ce1b41
 langcode: en
 status: true
 dependencies:
@@ -6,8 +5,8 @@ dependencies:
     - maidenov_user_api
     - serialization
     - user
-id: packing_key_exists
-plugin_id: packing_key_exists
+id: current_user_uuid
+plugin_id: current_user_uuid
 granularity: resource
 configuration:
   methods:
@@ -15,5 +14,4 @@ configuration:
   formats:
     - json
   authentication:
-    - cookie
     - oauth2
