@@ -25,16 +25,15 @@ use Drupal\Core\Database\Query\AlterableInterface;
  * - Views (if configured to check entity access)
  *
  * WHAT IT DOES:
- * - Super admin (uid=1): No filtering, sees all entities
- * - Regular users: Filters to show only entities where user_id = current user
+ * - All users: Filters to show only entities where user_id = current user
  * - Applies to both the main query AND the count query
  */
 function user_confidential_data_query_user_confidential_data_access_alter(AlterableInterface $query) {
   $account = \Drupal::currentUser();
 
-  // Super admin (uid = 1) can see everything - no filtering needed.
+  // All users must be filtered by ownership - no admin exceptions
   if ($account->id() == 1) {
-    return;
+    // Even admin users must be filtered by ownership
   }
 
   // Check if user has any "own" permissions.
@@ -81,16 +80,15 @@ function user_confidential_data_query_user_confidential_data_access_alter(Altera
  * - Bulk edit operations via EntityQuery
  *
  * WHAT IT DOES:
- * - Super admin (uid=1): No filtering, can edit all entities
- * - Regular users: Filters to show only entities where user_id = current user
+ * - All users: Filters to show only entities where user_id = current user
  * - Users without edit permission: Returns empty result
  */
 function user_confidential_data_query_user_confidential_data_edit_access_alter(AlterableInterface $query) {
   $account = \Drupal::currentUser();
 
-  // Super admin (uid = 1) can edit everything - no filtering needed.
+  // All users must be filtered by ownership - no admin exceptions
   if ($account->id() == 1) {
-    return;
+    // Even admin users must be filtered by ownership
   }
 
   // Check if user has edit own permission.
@@ -133,16 +131,15 @@ function user_confidential_data_query_user_confidential_data_edit_access_alter(A
  * - Bulk delete operations via EntityQuery
  *
  * WHAT IT DOES:
- * - Super admin (uid=1): No filtering, can delete all entities
- * - Regular users: Filters to show only entities where user_id = current user
+ * - All users: Filters to show only entities where user_id = current user
  * - Users without delete permission: Returns empty result
  */
 function user_confidential_data_query_user_confidential_data_delete_access_alter(AlterableInterface $query) {
   $account = \Drupal::currentUser();
 
-  // Super admin (uid = 1) can delete everything - no filtering needed.
+  // All users must be filtered by ownership - no admin exceptions
   if ($account->id() == 1) {
-    return;
+    // Even admin users must be filtered by ownership
   }
 
   // Check if the user has the delete own permission.
