@@ -53,6 +53,50 @@ services:
       - db
     restart: unless-stopped
 
+  # ========================================
+  # Frontend Services (React + Vite)
+  # ========================================
+
+  # Development Mode (with Hot Reload)
+  # Start with: docker-compose up frontend-dev
+  frontend-dev:
+    build:
+      context: /var/www/maidenov-passwords
+      dockerfile: Dockerfile
+      target: development
+    ports:
+      - "5173:5173"
+    volumes:
+      # Mount source code for hot reload
+      - /var/www/maidenov-passwords:/app
+      # Exclude node_modules (use container's version)
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_BACKEND_URL=http://drupal:80
+    depends_on:
+      - drupal
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+
+  # Production Mode (Optimized Build + Nginx)
+  # Start with: docker-compose up frontend-prod
+  frontend-prod:
+    build:
+      context: /var/www/maidenov-passwords
+      dockerfile: Dockerfile
+      target: production
+    ports:
+      - "5174:80"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - drupal
+    restart: unless-stopped
+    profiles:
+      - production
+
 volumes:
   db_data:
   redis_data:
